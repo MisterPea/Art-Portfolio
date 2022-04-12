@@ -22,5 +22,5 @@ Todo:
 * [ ] About component
 * [ ] Thumbnail component
 * [ ] Image presentation component - pinch zoom on mobile
-* [ ] Upload thumbnail
-* [ ] Upload main image
+* [x] Upload thumbnail
+* [x] Upload main image
