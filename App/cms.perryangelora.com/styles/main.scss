@@ -1,7 +1,10 @@
 @import "./mixins.scss";
 @import "./navbar.scss";
 @import "./thumbCreator.scss";
-@import "./button.scss";
+@import "./buttons.scss";
+@import "./textInput.scss";
+@import "./thumbDisplay.scss";
+@import "./loading.scss";
 
 html,
 body {
@@ -14,9 +17,17 @@ body {
 
 html,
 body,
-h1 {
+h1,
+h2,
+h3,
+h4, 
+ul {
   margin:0;
   padding:0;
+}
+
+li {
+  list-style: none;
 }
 
 button {
@@ -28,4 +39,8 @@ html {
   background-color: #FFFCF7;
   font-size: 16px;
 } 
+
+body {
+  margin: 10px 5px 0;
+}
 

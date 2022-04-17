@@ -1,25 +1,37 @@
+import { useEffect, useState, useRef } from 'react';
+import Button from './Button';
+import TextInput from './TextInput';
+import CircleButton from './CircleButton';
+import axios from 'axios';
+import {v4 as uuidv4} from 'uuid';
+import Loading from './Loading';
 
-import { useEffect, useState, useRef } from "react";
-import Button from "./Button";
+/**
+ * Component to create a thumbnail based on user upload and user scaling.
+ * @returns {JSX} Returns JSX
+ */
+export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
 
-// create up / down range
-export default function ThumbCreator() {
   const [fileState, setFileState] = useState(null);
-  const mag = useRef(5)
+  const [text, setText] = useState({title:'', medAndSize:'', gallery:''});
+  const [isIngesting, setIsIngesting] = useState(false);
+  const mag = useRef(5);
   const [mouseDown, setMouseDown] = useState(false);
   const canvas = useRef(null);
   const ctx = useRef(null);
   const img = useRef(null);
-  const windowSize = { h: 400, w: 400 };
+  const mainImage = useRef(null);
+  const windowSize = { h: 350, w: 350 };
   const dragStartXY = useRef({ x: 0, y: 0 });
   const imageStartXY = useRef({ x: 0, y: 0 });
   const reader = useRef();
-
-  // Instantiate Canvas
+ 
+  // Instantiate Canvas and FileReader. Note: within NextJS SSR, browser APIs
+  // need to be placed in useEffect, so they are initiated on mount.
   useEffect(() => {
     if (canvas.current === null && ctx.current === null) {
       reader.current = new FileReader();
-      canvas.current = document.getElementById("main-canvas");
+      canvas.current = document.getElementById('main-canvas');
       ctx.current = canvas.current.getContext('2d');
       ctx.current.imageSmoothingEnabled = false;
       ctx.current.mozImageSmoothingEnabled = false;
@@ -30,7 +42,7 @@ export default function ThumbCreator() {
     }
   }, []);
 
-  // Run on fileState/load
+  // Run on fileState/load change
   useEffect(() => {
     if (img.current) {
       img.current.onload = () => {
@@ -43,7 +55,26 @@ export default function ThumbCreator() {
     }
   }, [fileState]);
 
-  // Magnification Calls
+  useEffect(() => {
+    if(toEdit.file) {
+      const {file, title, medAndSize, gallery, thumbXY, magnification} = toEdit;
+      axios({
+        method:'POST',
+        url: 'api/getEditImage',
+        data:{url:`https://s3.amazonaws.com/perryangelora.com/cms/images/${file}`}
+      }).then((data) => {
+        imageStartXY.current = (thumbXY);
+        mag.current = magnification;
+        document.querySelector('.magnification-slider').value = `${magnification * 10}`;
+        setFileState('data:image/jpeg;base64,' + data.data);
+        setText({title, medAndSize, gallery});
+      });
+    }
+  }, [toEdit]);
+  /**
+   * Method to handle calls to magnify the image
+   * @param {*} e Element passed from onChange handler
+   */
   function handleMag(e) {
     const { h, w } = deriveImgDimensions();
     const prevMag = mag.current;
@@ -51,7 +82,6 @@ export default function ThumbCreator() {
     mag.current = e.target.value / 10;
     checkAndUpdateMagnification(prevMag, currentMag);
   }
-
 
   function handleMouseDown(e) {
     !mouseDown && setMouseDown(true);
@@ -74,9 +104,7 @@ export default function ThumbCreator() {
     if (mouseDown) {
       const requestX = e.nativeEvent.offsetX - dragStartXY.current.x + imageStartXY.current.x;
       const requestY = e.nativeEvent.offsetY - dragStartXY.current.y + imageStartXY.current.y;
-
       checkAndUpdateImgXY(Math.ceil(requestX), Math.ceil(requestY));
-
       dragStartXY.current.x = e.nativeEvent.offsetX;
       dragStartXY.current.y = e.nativeEvent.offsetY;
     }
@@ -162,17 +190,19 @@ export default function ThumbCreator() {
     window.requestAnimationFrame(clearAndDraw);
   }
 
-
+  /**
+   * Helper method to derive the aspect ration of the image
+   * @returns Returns a Object with width and height, as `w` and `h`.
+   * At least one of the numbers will be 1.
+   */
   function deriveImgDimensions() {
     const w = img.current.width;
     const h = img.current.height;
-
     let ratio = 1;
     let outputRatio = {
       w: 1,
       h: 1
     };
-
     if (w < h) {
       ratio = h / w;
       outputRatio.h = ratio;
@@ -183,6 +213,9 @@ export default function ThumbCreator() {
     return outputRatio;
   }
 
+  /**
+   * Method to render an image inside of a Canvas element.
+   */
   function clearAndDraw() {
     const { w, h } = deriveImgDimensions();
     ctx.current.clearRect(0, 0, windowSize.h, windowSize.w);
@@ -192,56 +225,273 @@ export default function ThumbCreator() {
       (windowSize.w * w * mag.current).toFixed(2), (windowSize.h * h * mag.current).toFixed(2));
   }
 
+  /**
+   * Method to take an uploaded allow it to be used as an `<img>` in a Canvas object, and to be uploaded elsewhere.
+   * @param {*} e 
+   */
   function addImage(e) {
     if (e.target.files && e.target.files[0]) {
-     // Insert - save file to local...then up to s3 
+      mainImage.current = e.target.files[0];
       reader.current.readAsDataURL(e.target.files[0]);
-      reader.current.addEventListener("load", addImage);
+      reader.current.addEventListener('load', addImage);
       reader.current.onload = (f) => {
         setFileState(f.target.result);
       };
     }
+    // Reset Text id any of the fields are filled
+    if(text.title.length + text.gallery.length + text.medAndSize.length > 0) {
+      setText({title:'', medAndSize:'', gallery:''});
+    }
+  }
+ 
+  /**
+   * Method to update S3 with image and JSON files.
+   */
+  function sendFilesForIngest(){
+    const uuid = uuidv4();
+    const uploadComplete = {thumb: false, main: false, json: false};
+    const thumbData = new FormData();
+    const mainImgData = new FormData();
+    const JsonData = new FormData();
+
+    const lowerCanvas = document.querySelector('.lower-canvas-holder');
+    lowerCanvas.classList.add('ingesting');
+    setIsIngesting(true);
+
+    const allUploadsComplete = () => {
+      if(Object.values(uploadComplete).every((e) => e === true)) {
+        setIsIngesting(false);
+        lowerCanvas.classList.remove('ingesting');
+        setFileState(null);
+        mag.current = 5;
+        setText({title:'', medAndSize:'', gallery:''});
+        refresh();
+      }
+    };
+
+    // Thumb Image Upload
+    canvas.current.toBlob((blob) => {
+      const img = new File([blob], `${uuid}_thumb.jpeg`, {type:'image/jpeg'});
+      thumbData.append('file', img, `${uuid}_thumb.jpeg`);
+      axios({
+        method:'POST',
+        url: 'api/upload/thumb',
+        data: thumbData,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(() => {
+        uploadComplete.thumb = true;
+        allUploadsComplete();;
+      }).catch((err) => console.log(err));
+    }, 'image/jpeg', 1.0);
+  
+    // Main Image Upload
+    const extension = mainImage.current.name.split('.').pop();
+    mainImgData.append('file', mainImage.current, `${uuid}.${extension}`);
+    axios({
+      method:'POST',
+      url: 'api/upload/main',
+      data: mainImgData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    }).then(() => {
+      uploadComplete.main = true;
+      allUploadsComplete();
+    })
+      .catch((err) => console.log(err));
+
+    const fileInfo = JSON.parse(thumbs);
+    const fileJson = {
+      order:fileInfo.length,
+      id: uuid,
+      name: text.title,
+      medAndSize: text.medAndSize,
+      thumbFileName: `${uuid}_thumb.jpeg`,
+      mainFileName: `${uuid}.${extension}`,
+      gallery: text.gallery,
+      thumbXY: imageStartXY.current,
+      magnification: mag.current,
+    };
+    fileInfo.push(fileJson);
+
+    const jsonFile = new File([JSON.stringify(fileInfo, null, '\t')], 'cms.json', {type:'application/json'});
+    JsonData.append('file', jsonFile, 'cms.json');
+    axios({
+      method:'POST',
+      url:'api/upload/json',
+      data: JsonData,
+      headers: {
+        'Content-Type':'multipart/form-data'
+      }
+    }).then(() => {
+      uploadComplete.json = true;
+      allUploadsComplete();
+    })
+      .catch((err) => console.log(err));
+  }
+  /**
+   * Method to update the text and/or thumbnail image.
+   * The JSON file will be update and a new thumbnail will be created with each instance
+   */
+  function updateRecord(){ 
+    const uuid = uuidv4();
+    const JsonData = new FormData();
+    const thumbData = new FormData();
+    const uploadComplete = {thumb: false, json: false, deleteOldThumb: false};
+
+    const lowerCanvas = document.querySelector('.lower-canvas-holder');
+    lowerCanvas.classList.add('ingesting');
+    setIsIngesting(true);
+
+    const allUploadsComplete = () => {
+      if(Object.values(uploadComplete).every((e) => e === true)) {
+        setIsIngesting(false);
+        lowerCanvas.classList.remove('ingesting');
+        setFileState(null);
+        mag.current = 5;
+        setText({title:'', medAndSize:'', gallery:''});
+        resetEdit();
+        refresh();
+      }
+    };
+
+    const deleteThumb = (filename) => {
+      axios({
+        method:'DELETE',
+        url:'api/deleteThumb',
+        data: filename
+      }).then(() => {
+        uploadComplete.deleteOldThumb = true;
+        allUploadsComplete();
+      })
+    };
+
+    // Thumb Upload
+    canvas.current.toBlob((blob) => {
+      console.log(`${toEdit.id}_thumb.jpeg`);
+      const img = new File([blob], `${uuid}_thumb.jpeg`, {type:'image/jpeg'});
+      thumbData.append('file', img, `${uuid}_thumb.jpeg`);
+      axios({
+        method:'POST',
+        url: 'api/upload/thumb',
+        data: thumbData,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(() => {
+        uploadComplete.thumb = true;
+        allUploadsComplete();
+      }).catch((err) => console.log(err));
+    }, 'image/jpeg', 1.0);
+
+    const fileInfo = JSON.parse(thumbs);
+    const newFileInfo = fileInfo.map((element) => {
+      if(element.id === toEdit.id){
+        deleteThumb(element.thumbFileName);
+        return {
+          order:0,
+          id: element.id,
+          name: text.title,
+          medAndSize: text.medAndSize,
+          thumbFileName: `${uuid}_thumb.jpeg`,
+          mainFileName: element.mainFileName,
+          gallery: text.gallery,
+          thumbXY: imageStartXY.current,
+          magnification: mag.current,
+        };
+      } else {
+        return element;
+      }
+    });
+
+    const jsonFile = new File([JSON.stringify(newFileInfo, null, '\t')], 'cms.json', {type:'application/json'});
+    JsonData.append('file', jsonFile, 'cms.json');
+    axios({
+      method:'POST',
+      url:'api/upload/json',
+      data: JsonData,
+      headers: {
+        'Content-Type':'multipart/form-data'
+      }
+    }).then(() => {
+      uploadComplete.json = true;
+      allUploadsComplete();
+    })
+      .catch((err) => console.log(err));
   }
 
-  function createDataURI() {
-    let imageData = canvas.current.toDataURL();
-    console.log(imageData);
+
+  function handleInputText(e) {
+    if(e.target.id === 'Title:') {
+      setText({title: e.target.value, medAndSize: text.medAndSize, gallery: text.gallery});
+    } else if(e.target.id === 'Medium/Size:'){
+      setText({title: text.title, medAndSize: e.target.value, gallery: text.gallery});
+    } else {
+      setText({title: text.title, medAndSize: text.medAndSize, gallery: e.target.value});
+    }
   }
 
-  function handleUploadClick(){
-    mag.current = 5; // reset <------ also slider
+  /**
+   * Method to close the area with the uploaded image.
+   */
+  function handleCloseButton() {
+    setText({title:'', medAndSize:'', gallery:''});
+    setFileState(null);
+  }
+
+  function handleUploadClick() {
+    if(toEdit.file) {
+      resetEdit();
+    }
     document.getElementById('fileUpload').click();
-
   }
-  const accepted = ".jpg, .jpeg, .gif, .tiff, .tif, .webp, .png";
+  const accepted = '.jpg, .jpeg, .gif, .tiff, .tif, .webp, .png';
 
   return (
-    <div className="App">
-      <input
-        onChange={(e) => handleMag(e)}
-        id="range"
-        type="range"
-        min="10"
-        max="100"
-        // value={mag * 10}
-      />
-      <Button label="Upload Image" action={handleUploadClick}/>
-      <input id="fileUpload" onChange={(e) => addImage(e)} type="file" accept={accepted} />
-      <canvas
-        onTouchMove={handleTouchMove}
-        onTouchStart={handleTouchDown}
-        onTouchEnd={handleMouseUp}
-        onMouseMove={handleMouseMove}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        id="main-canvas"
-        height={windowSize.h}
-        width={windowSize.w}
-      >
-        Canvas Not Available
-      </canvas>
-      <Button action={createDataURI} label="Add Image" />
+    <div className='canvas-background'> 
+      <div className="canvas-holder">
+        <div className={`top-buttons-bar ${fileState ? 'active' : ''}`}>
+          <Button label="Upload Image" action={handleUploadClick} />
+          <CircleButton clickHandle={handleCloseButton} />
+          <input id="fileUpload" onChange={(e) => addImage(e)} type="file" accept={accepted} />
+        </div>
+        {isIngesting && <Loading />}
+        <div className={`lower-canvas-holder ${fileState ? 'active' : ''}`}>
+          <canvas
+            onTouchMove={handleTouchMove}
+            onTouchStart={handleTouchDown}
+            onTouchEnd={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            id="main-canvas"
+            height={windowSize.h}
+            width={windowSize.w}
+          >
+          Canvas Not Available
+          </canvas>
+          <TextInput action={handleInputText} value={text.title} label="Title:" placeholder="Enter Title" />
+          <TextInput action={handleInputText} value={text.medAndSize} label="Medium/Size:" placeholder="Enter Medium and Size" />
+          <TextInput action={handleInputText} value={text.gallery} label="Gallery:" placeholder="Enter Gallery Title" />
+          <input
+            className="magnification-slider"
+            onChange={(e) => handleMag(e)}
+            id="range"
+            type="range"
+            min="10"
+            max="100"
+          />
+          <Button
+            action={toEdit.id ? updateRecord: sendFilesForIngest }
+            label={toEdit.id ? 'Update Thumbnail' :'Add Thumbnail'}
+            color="green"
+            disabled={!text.title || !text.medAndSize || !text.gallery}
+          />
+        </div>
+      </div>
     </div>
   );
 }

@@ -13,6 +13,12 @@
     background-color: #81B77C;
     color: #fff;
     border: 1px #6b9a67 solid;
+    transition: all 250ms ease-in-out;
+    &:disabled {
+      cursor: default;
+      background-color: #d2f0cf;
+      border: 1px #cfe8cc solid;
+    }
   }
 }
 

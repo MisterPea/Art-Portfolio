@@ -1,0 +1,67 @@
+.loading-component {
+  position: absolute;
+  z-index: 11;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  h3 {
+    @include regular-text;
+  }
+}
+
+.loading-wrapper {
+  margin: 0 auto;
+  width: 50px;
+  height: 50px;
+  position: relative;
+  animation: rotateCircle 1000ms linear infinite;
+}
+
+.loading-circle {
+  position: absolute;
+  margin: auto;
+  height: 100%;
+  width: 100%;
+  fill: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+}
+
+.circle-stroke-two {
+  stroke: #709d6d;
+  stroke-width: 5;
+  stroke-linecap: square;
+  animation: tweenLine 2s linear infinite;
+  margin: auto;
+}
+
+.circle-stroke {
+  stroke: #cee3cc;
+  stroke-width: 5;
+  stroke-linecap: square;
+  margin: auto;
+}
+
+@keyframes tweenLine {
+  0% {
+    stroke-dashoffset: 0;
+    stroke-dasharray: 0, 80;
+  }
+  50% {
+    stroke-dashoffset: 300;
+    stroke-dasharray: 120, 180;
+  }
+  100% {
+    stroke-dashoffset: 400;
+    stroke-dasharray: 180, 380;
+  }
+}
+
+@keyframes rotateCircle {
+  100% {
+    transform: rotate(360deg);
+  }
+}

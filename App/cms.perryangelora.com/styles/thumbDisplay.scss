@@ -1,10 +1,36 @@
+.thumb-nav {
+  margin-bottom: 10px;
+  ul {
+    display: flex;
+    @include bold-text;
+    font-size: 1.4;
+    width: fit-content;
+    margin: 0 auto;
+  }
+  li {
+    padding: 5px 10px;
+    margin: 0 10px;
+    cursor: pointer;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
 .thumb-ul-wrapper {
   overflow-y: scroll;
+  .empty-list {
+    @include bold-text;
+    margin: 20px auto;
+    text-align: center;
+
+  }
 }
 
 .thumb-list {
   @include bold-text;
   width: fit-content;
+  overflow-y: scroll;
 }
 
 .thumb-list-item {
