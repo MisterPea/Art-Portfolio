@@ -11,21 +11,28 @@ export const config = {
 };
 export default async function handler(req, res) {
   const form = new formidable.IncomingForm();
-
-  form.parse(req, async (err, fields, files) => {
-    const params = {
-      Bucket: 'perryangelora.com',
-      Key: `cms/images/${files.file.originalFilename}`,
-    };
-    const S3 = new S3Client({region: 'us-east-1'});
-    const command = new PutObjectCommand(params);  
-    const fileBuffer = fs.readFileSync(files.file.filepath);
-    const url = await getSignedUrl(S3, command);
-    axios({
-      method: 'PUT',
-      url,
-      data: fileBuffer
-    }).then(() => res.status(200).send())
-      .catch((err) => console.log('THUMB_ERR:', err));
-  });
+  return new Promise((resolve, reject) => {
+    form.parse(req, async (err, fields, files) => {
+      const params = {
+        Bucket: 'perryangelora.com',
+        Key: `cms/images/${files.file.originalFilename}`,
+      };
+      const S3 = new S3Client({region: 'us-east-1'});
+      const command = new PutObjectCommand(params);  
+      const fileBuffer = fs.readFileSync(files.file.filepath);
+      const url = await getSignedUrl(S3, command);
+      axios({
+        method: 'PUT',
+        url,
+        data: fileBuffer
+      }).then(() => {
+        res.status(204).end();
+        resolve();
+      })
+        .catch((err) => {
+          res.status(418).json({success:err});
+          resolve();
+        });
+    });
+  }); 
 }
