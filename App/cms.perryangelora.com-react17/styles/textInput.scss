@@ -1,0 +1,22 @@
+.text-input-group {
+  display: flex;
+  @include bold-text;
+  margin: 5px 10px;
+  font-size: 1.2rem;
+  align-items: center;
+  label {
+    margin-right: 2px;
+    ;
+  }
+  input {
+    font-size: 1rem;
+    border: none;
+    border-radius: 2px;
+    padding: 2px 0;
+    padding-left: 5px;
+    flex:1;
+    @include regular-text;
+    border-bottom: 0.5px solid black;
+
+  }
+}
