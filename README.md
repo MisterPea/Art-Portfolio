@@ -3,7 +3,7 @@
 Fine Art Portfolio
 
 Todo:
-#### CMS - Pure React
+#### CMS - NextJS SSR - Concived for desktop use only. 
 * [x] Find all relevant thumbnails per gallery. e.g. All/Polychrome/Monochrome
 * [x] Download current thumbnails
 * [x] Deleting thumbnails deletes image and updates JSON
@@ -13,9 +13,7 @@ Todo:
 * [x] Drag reorder of thumbnails
 * [ ] Update database on reorder
 * [ ] Will exist as a subdomain...updating site will trigger a rebuild via GitHub Actions maybe through [`repository_dispatch`](https://stackoverflow.com/questions/68147899/whats-is-the-difference-between-repository-dispatch-and-workflow-dispatch-in-git)
-* [x] Mobile Layout
 * [ ] Tablet/Desktop Layout
-* [ ] Pinch zoom for mobile
 
 
 #### NextJS
