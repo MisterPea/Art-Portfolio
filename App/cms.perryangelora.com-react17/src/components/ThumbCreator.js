@@ -304,7 +304,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
 
     const fileInfo = JSON.parse(thumbs);
     const fileJson = {
-      order:fileInfo.length,
+      order:`${text.gallery[0]}${fileInfo.length}`,
       id: uuid,
       name: text.title,
       medAndSize: text.medAndSize,
@@ -391,7 +391,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
       if(element.id === toEdit.id){
         deleteThumb(element.thumbFileName);
         return {
-          order:0,
+          order: element.order,
           id: element.id,
           name: text.title,
           medAndSize: text.medAndSize,
