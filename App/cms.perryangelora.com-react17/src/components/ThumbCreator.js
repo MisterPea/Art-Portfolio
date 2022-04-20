@@ -25,6 +25,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
   const dragStartXY = useRef({ x: 0, y: 0 });
   const imageStartXY = useRef({ x: 0, y: 0 });
   const reader = useRef();
+  const accepted = '.jpg, .jpeg, .gif, .tiff, .tif, .webp, .png';
  
   // Instantiate Canvas and FileReader. Note: within NextJS SSR, browser APIs
   // need to be placed in useEffect, so they are initiated on mount.
@@ -365,7 +366,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
       }).then(() => {
         uploadComplete.deleteOldThumb = true;
         allUploadsComplete();
-      })
+      });
     };
 
     // Thumb Upload
@@ -445,9 +446,11 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
     if(toEdit.file) {
       resetEdit();
     }
+    document.querySelector('.magnification-slider').value = '30';
     document.getElementById('fileUpload').click();
   }
-  const accepted = '.jpg, .jpeg, .gif, .tiff, .tif, .webp, .png';
+
+  
 
   return (
     <div className='canvas-background'> 
@@ -482,7 +485,8 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
             id="range"
             type="range"
             min="10"
-            max="100"
+            max="50"
+            step="0.1"
           />
           <Button
             action={toEdit.id ? updateRecord: sendFilesForIngest }

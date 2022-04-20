@@ -39,6 +39,8 @@
     }
   }
 
+  
+
   .lower-canvas-holder {
     display: block;
     position: relative;
@@ -48,6 +50,7 @@
     transition: max-height 350ms ease-in-out;
     &.active {
       max-height: 100vh;
+   
       &.ingesting {
         &::after {
           margin-top: 10px;
@@ -77,11 +80,54 @@
       margin-top: 15px;
     }
   }
-
+  input[type=range] {
+    border: none;
+  }
   .magnification-slider {
-    @media (hover: none) {
-      display: none;
+    // @media (hover: none) {
+    //   display: none;
+    // }
+    
+    width: 99%;
+    margin: 0 auto;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    width: 99%;
+    &::-moz-range-thumb{
+      -webkit-appearance: none; /* Override default look */
+      appearance: none;
+      margin-top: -12px; /* Centers thumb on the track */
+      background-color: #444a4b;
+      height: 0.8rem;
+      width: 0.8rem;  
+      border: none;
     }
-    width: 100%;
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none; /* Override default look */
+      appearance: none;
+      margin-top: -0.3rem; /* Centers thumb on the track */
+      background-color: #444a4b;
+      height: 0.9rem;
+      width: 0.9rem;  
+      border-radius: 999px;
+    }
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    border: 0.5px solid black;
+    border-radius: 999px;
+    height: 0.35rem;
+  }
+
+  input[type="range"]::-moz-range-track {
+    // background: #053a5f;
+    border: 0.5px solid black;
+    border-radius: 999px;
+    height: 0.35rem;
   }
 }

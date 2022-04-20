@@ -15,7 +15,11 @@
     &:hover {
       text-decoration: underline;
     }
+    &.active {
+      text-decoration: underline;
+    }
   }
+  
 }
 .thumb-ul-wrapper {
   // height: 100vh;
@@ -28,7 +32,9 @@
 
 .thumb-list {
   @include bold-text;
-  width: fit-content;
+  min-width: 450px;
+  max-width: 700px;
+  margin: 0 auto;
   // height: 100vh;
 }
 .thumb-list-item span {
@@ -50,6 +56,11 @@
     padding-right: 10px;
     align-self: center;
     flex:1;
+    p {
+      @include regular-text;
+      font-size: 0.8rem;
+      margin-bottom:0;
+    }
   }
 
   .button-wrapper {

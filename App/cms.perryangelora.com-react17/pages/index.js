@@ -31,8 +31,6 @@ export async function getServerSideProps() {
   };
 }
 
-
-
 export default function Home({ thumbContents }) { 
   const [edit, setEdit] = useState({id:undefined, file:undefined, title:'', medAndSize:'', gallery:'', thumbXY:{x:0, y:0}, magnification:5});
 

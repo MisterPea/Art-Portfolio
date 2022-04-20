@@ -19,6 +19,7 @@ export const ThumbItem = ({thumb, deleteEntry, makeEdit}) => {
         <div className='text-holder'>
           <h3>{thumb.name}</h3>
           <h4>{thumb.medAndSize}</h4>
+          <p>{thumb.gallery}</p>
         </div>
         <div className='button-wrapper'>
           <button onClick={() => deleteEntry(thumb.id)}>Delete</button>
