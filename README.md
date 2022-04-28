@@ -11,9 +11,10 @@ Todo:
 * [x] Upload image/choose thumbnail/upload thumbnail
 * [x] Add info for image - [JSON stored on S3](https://dev.to/aws-builders/using-aws-s3-as-a-database-17l0)
 * [x] Drag reorder of thumbnails
+* [x] Add auth to prevent unauthorized edits
 * [ ] Update database on reorder
 * [ ] Will exist as a subdomain...updating site will trigger a rebuild via GitHub Actions maybe through [`repository_dispatch`](https://stackoverflow.com/questions/68147899/whats-is-the-difference-between-repository-dispatch-and-workflow-dispatch-in-git)
-* [ ] Tablet/Desktop Layout
+* [x] Tablet/Desktop Layout
 
 
 #### NextJS
