@@ -2,12 +2,12 @@ import { Reorder, useMotionValue } from 'framer-motion';
 import { useRaisedShadow } from '../hooks/useRaisedShadow';
 import Image from 'next/image';
 
-export const ThumbItem = ({thumb, deleteEntry, makeEdit}) => {
+export const ThumbItem = ({ thumb, deleteEntry, makeEdit, disabled }) => {
   const y = useMotionValue(0);
   const boxShadow = useRaisedShadow(y);
   return (
     
-    <Reorder.Item value={thumb} style={{boxShadow, y}}>
+    <Reorder.Item value={thumb} style={{ boxShadow, y }}>
       <div className='thumb-list-item'>
         <Image
           src={`https://s3.amazonaws.com/perryangelora.com/cms/thumbs/${thumb.thumbFileName}`}
@@ -19,9 +19,10 @@ export const ThumbItem = ({thumb, deleteEntry, makeEdit}) => {
         <div className='text-holder'>
           <h3>{thumb.name}</h3>
           <h4>{thumb.medAndSize}</h4>
+          <p>{thumb.gallery}</p>
         </div>
         <div className='button-wrapper'>
-          <button onClick={() => deleteEntry(thumb.id)}>Delete</button>
+          <button disabled={disabled} onClick={() => deleteEntry(thumb.id)}>Delete</button>
           <button onClick={() => makeEdit(thumb.id, thumb.mainFileName, thumb.name, thumb.medAndSize, thumb.gallery, thumb.thumbXY, thumb.magnification)}>Edit</button>
         </div>
       </div>

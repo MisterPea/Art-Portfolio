@@ -3,17 +3,17 @@ import Button from './Button';
 import TextInput from './TextInput';
 import CircleButton from './CircleButton';
 import axios from 'axios';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import Loading from './Loading';
+import { useSession } from 'next-auth/react';
 
 /**
  * Component to create a thumbnail based on user upload and user scaling.
  * @returns {JSX} Returns JSX
  */
-export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
-
+export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
   const [fileState, setFileState] = useState(null);
-  const [text, setText] = useState({title:'', medAndSize:'', gallery:''});
+  const [text, setText] = useState({ title:'', medAndSize:'', gallery:'' });
   const [isIngesting, setIsIngesting] = useState(false);
   const mag = useRef(5);
   const [mouseDown, setMouseDown] = useState(false);
@@ -25,6 +25,8 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
   const dragStartXY = useRef({ x: 0, y: 0 });
   const imageStartXY = useRef({ x: 0, y: 0 });
   const reader = useRef();
+  const accepted = '.jpg, .jpeg, .gif, .tiff, .tif, .webp, .png';
+  const { data } = useSession();
  
   // Instantiate Canvas and FileReader. Note: within NextJS SSR, browser APIs
   // need to be placed in useEffect, so they are initiated on mount.
@@ -57,17 +59,17 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
 
   useEffect(() => {
     if(toEdit.file) {
-      const {file, title, medAndSize, gallery, thumbXY, magnification} = toEdit;
+      const { file, title, medAndSize, gallery, thumbXY, magnification } = toEdit;
       axios({
         method:'POST',
         url: 'api/getEditImage',
-        data:{url:`https://s3.amazonaws.com/perryangelora.com/cms/images/${file}`}
+        data:{ url:`https://s3.amazonaws.com/perryangelora.com/cms/images/${file}` }
       }).then((data) => {
         imageStartXY.current = (thumbXY);
         mag.current = magnification;
         document.querySelector('.magnification-slider').value = `${magnification * 10}`;
         setFileState('data:image/jpeg;base64,' + data.data);
-        setText({title, medAndSize, gallery});
+        setText({ title, medAndSize, gallery });
       });
     }
   }, [toEdit]);
@@ -240,7 +242,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
     }
     // Reset Text id any of the fields are filled
     if(text.title.length + text.gallery.length + text.medAndSize.length > 0) {
-      setText({title:'', medAndSize:'', gallery:''});
+      setText({ title:'', medAndSize:'', gallery:'' });
     }
   }
  
@@ -249,7 +251,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
    */
   function sendFilesForIngest(){
     const uuid = uuidv4();
-    const uploadComplete = {thumb: false, main: false, json: false};
+    const uploadComplete = { thumb: false, main: false, json: false };
     const thumbData = new FormData();
     const mainImgData = new FormData();
     const JsonData = new FormData();
@@ -264,14 +266,14 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
         lowerCanvas.classList.remove('ingesting');
         setFileState(null);
         mag.current = 5;
-        setText({title:'', medAndSize:'', gallery:''});
+        setText({ title:'', medAndSize:'', gallery:'' });
         refresh();
       }
     };
 
     // Thumb Image Upload
     canvas.current.toBlob((blob) => {
-      const img = new File([blob], `${uuid}_thumb.jpeg`, {type:'image/jpeg'});
+      const img = new File([blob], `${uuid}_thumb.jpeg`, { type:'image/jpeg' });
       thumbData.append('file', img, `${uuid}_thumb.jpeg`);
       axios({
         method:'POST',
@@ -316,7 +318,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
     };
     fileInfo.push(fileJson);
 
-    const jsonFile = new File([JSON.stringify(fileInfo, null, '\t')], 'cms.json', {type:'application/json'});
+    const jsonFile = new File([JSON.stringify(fileInfo, null, '\t')], 'cms.json', { type:'application/json' });
     JsonData.append('file', jsonFile, 'cms.json');
     axios({
       method:'POST',
@@ -339,7 +341,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
     const uuid = uuidv4();
     const JsonData = new FormData();
     const thumbData = new FormData();
-    const uploadComplete = {thumb: false, json: false, deleteOldThumb: false};
+    const uploadComplete = { thumb: false, json: false, deleteOldThumb: false };
 
     const lowerCanvas = document.querySelector('.lower-canvas-holder');
     lowerCanvas.classList.add('ingesting');
@@ -351,7 +353,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
         lowerCanvas.classList.remove('ingesting');
         setFileState(null);
         mag.current = 5;
-        setText({title:'', medAndSize:'', gallery:''});
+        setText({ title:'', medAndSize:'', gallery:'' });
         resetEdit();
         refresh();
       }
@@ -365,13 +367,13 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
       }).then(() => {
         uploadComplete.deleteOldThumb = true;
         allUploadsComplete();
-      })
+      });
     };
 
     // Thumb Upload
     canvas.current.toBlob((blob) => {
       console.log(`${toEdit.id}_thumb.jpeg`);
-      const img = new File([blob], `${uuid}_thumb.jpeg`, {type:'image/jpeg'});
+      const img = new File([blob], `${uuid}_thumb.jpeg`, { type:'image/jpeg' });
       thumbData.append('file', img, `${uuid}_thumb.jpeg`);
       axios({
         method:'POST',
@@ -406,7 +408,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
       }
     });
 
-    const jsonFile = new File([JSON.stringify(newFileInfo, null, '\t')], 'cms.json', {type:'application/json'});
+    const jsonFile = new File([JSON.stringify(newFileInfo, null, '\t')], 'cms.json', { type:'application/json' });
     JsonData.append('file', jsonFile, 'cms.json');
     axios({
       method:'POST',
@@ -425,11 +427,11 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
 
   function handleInputText(e) {
     if(e.target.id === 'Title:') {
-      setText({title: e.target.value, medAndSize: text.medAndSize, gallery: text.gallery});
+      setText({ title: e.target.value, medAndSize: text.medAndSize, gallery: text.gallery });
     } else if(e.target.id === 'Medium/Size:'){
-      setText({title: text.title, medAndSize: e.target.value, gallery: text.gallery});
+      setText({ title: text.title, medAndSize: e.target.value, gallery: text.gallery });
     } else {
-      setText({title: text.title, medAndSize: text.medAndSize, gallery: e.target.value});
+      setText({ title: text.title, medAndSize: text.medAndSize, gallery: e.target.value });
     }
   }
 
@@ -437,7 +439,7 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
    * Method to close the area with the uploaded image.
    */
   function handleCloseButton() {
-    setText({title:'', medAndSize:'', gallery:''});
+    setText({ title:'', medAndSize:'', gallery:'' });
     setFileState(null);
   }
 
@@ -445,9 +447,11 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
     if(toEdit.file) {
       resetEdit();
     }
+    document.querySelector('.magnification-slider').value = '30';
     document.getElementById('fileUpload').click();
   }
-  const accepted = '.jpg, .jpeg, .gif, .tiff, .tif, .webp, .png';
+
+  
 
   return (
     <div className='canvas-background'> 
@@ -482,14 +486,24 @@ export default function ThumbCreator({thumbs, refresh, toEdit, resetEdit}) {
             id="range"
             type="range"
             min="10"
-            max="100"
+            max="50"
+            step="0.1"
           />
-          <Button
-            action={toEdit.id ? updateRecord: sendFilesForIngest }
-            label={toEdit.id ? 'Update Thumbnail' :'Add Thumbnail'}
-            color="green"
-            disabled={!text.title || !text.medAndSize || !text.gallery}
-          />
+          {data ? 
+            <Button
+              action={toEdit.id ? updateRecord: sendFilesForIngest }
+              label={toEdit.id ? 'Update Thumbnail' :'Add Thumbnail'}
+              color="green"
+              disabled={!text.title || !text.medAndSize || !text.gallery}
+            />
+            :
+            <Button
+              label={'You Must Be Logged in to Make Changes'}
+              color="green"
+              disabled={!text.title || !text.medAndSize || !text.gallery}
+              isPlaceholder
+            />
+          }
         </div>
       </div>
     </div>

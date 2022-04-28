@@ -1,6 +1,10 @@
 {
   "extends": "next/core-web-vitals",
   "rules": {
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
     "react-hooks/exhaustive-deps": "off",
     "quotes": [
       2,

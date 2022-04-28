@@ -1,5 +1,6 @@
 import '../styles/main.scss';
 import Head from 'next/head';
+import { SessionProvider } from 'next-auth/react';
 
 function MyApp({ Component, pageProps }) {
   return ( 
@@ -10,7 +11,9 @@ function MyApp({ Component, pageProps }) {
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1 viewport-fit=cover" />
 
       </Head>
-      <Component {...pageProps} />
+      <SessionProvider session={pageProps.session}>
+        <Component {...pageProps} />
+      </SessionProvider>
     </>);
 }
 

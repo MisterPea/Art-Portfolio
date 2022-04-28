@@ -14,7 +14,6 @@ export default async function handler(req, res) {
       stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
     });
 
-
   const { Body } = await S3.send(new GetObjectCommand(params));
   const bodyContents = await streamToString(Body);  
   res.status(200).json(bodyContents);
