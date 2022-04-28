@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Image from 'next/image';
-import {useState} from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../src/components/Navbar';
 import ThumbCreator from '../src/components/ThumbCreator';
@@ -32,7 +32,7 @@ export async function getServerSideProps() {
 }
 
 export default function Home({ thumbContents }) { 
-  const [edit, setEdit] = useState({id:undefined, file:undefined, title:'', medAndSize:'', gallery:'', thumbXY:{x:0, y:0}, magnification:5});
+  const [edit, setEdit] = useState({ id:undefined, file:undefined, title:'', medAndSize:'', gallery:'', thumbXY:{ x:0, y:0 }, magnification:5 });
 
   const router = useRouter();
   // Method to force a reload to trigger getServerSideProps
@@ -59,14 +59,14 @@ export default function Home({ thumbContents }) {
   }
 
   function resetEditEntry(){
-    setEdit({id:undefined, file:undefined, title:'', medAndSize:'', gallery:'', thumbXY:{x:0, y:0}, magnification:5});
+    setEdit({ id:undefined, file:undefined, title:'', medAndSize:'', gallery:'', thumbXY:{ x:0, y:0 }, magnification:5 });
   }
 
   function deleteEntry(id){
     axios({
       method:'DELETE',
       url: 'api/deleteEntry',
-      data: {id, thumbContents}
+      data: { id, thumbContents }
     }).then(() => refreshData())
       .catch((err) => console.log(err));
   }
