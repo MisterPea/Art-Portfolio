@@ -11,7 +11,7 @@
     padding: 5px 10px;
     margin: 0 10px;
     cursor: pointer;
-    
+
     &:hover {
       text-decoration: underline;
     }
@@ -19,7 +19,6 @@
       text-decoration: underline;
     }
   }
-  
 }
 .thumb-ul-wrapper {
   // height: 100vh;
@@ -30,13 +29,21 @@
   }
 }
 
-.thumb-list {
+.thumb-list,
+.drag-instruct {
   @include bold-text;
   min-width: 450px;
   max-width: 700px;
   margin: 0 auto;
   // height: 100vh;
 }
+
+.drag-instruct {
+  font-size: 0.9rem;
+  padding: 10px 5px 2px;
+  text-align: center;
+}
+
 .thumb-list-item span {
   display: block;
 }
@@ -45,7 +52,7 @@
   display: flex;
   margin: 2px 0;
   padding-right: 10px;
-  background-color: #FFF;
+  background-color: #fff;
   border: 0.5px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   overflow: hidden;
@@ -55,11 +62,11 @@
     margin-left: 10px;
     padding-right: 10px;
     align-self: center;
-    flex:1;
+    flex: 1;
     p {
       @include regular-text;
       font-size: 0.8rem;
-      margin-bottom:0;
+      margin-bottom: 0;
     }
   }
 
@@ -68,7 +75,6 @@
     height: fit-content;
     align-self: center;
     margin-left: 20px;
-    
   }
 
   button {
@@ -81,6 +87,10 @@
 
     &:first-child {
       margin-left: 10px;
+    }
+    &:disabled {
+      color: #c6c6c6;
+      border: 0.5px solid rgba(0, 0, 0, 0.1);
     }
   }
 }
