@@ -1,6 +1,6 @@
 Fine Art Portfolio
 ---
-This repository is consists of two parts:
+This repository consists of two parts:
 * A SSR desktop-only CMS system
 * A SSG portfolio website
 
