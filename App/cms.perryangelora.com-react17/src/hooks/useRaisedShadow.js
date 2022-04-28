@@ -1,7 +1,7 @@
-import { animate, MotionValue, useMotionValue } from 'framer-motion';
+import { animate, useMotionValue } from 'framer-motion';
 import { useEffect } from 'react';
 
-const inactiveShadow = '0px 0px 0px rgba(0,0,0,0.8)';
+const inactiveShadow = 'rgba(50, 50, 93, 0.25) 0px 0px 0px 0px, rgba(0, 0, 0, 0.3) 0px 0px 0px 0px';
 
 export function useRaisedShadow(value) {
   const boxShadow = useMotionValue(inactiveShadow);
@@ -13,7 +13,7 @@ export function useRaisedShadow(value) {
       if (latest !== 0) {
         isActive = true;
         if (isActive !== wasActive) {
-          animate(boxShadow, '5px 5px 10px rgba(0,0,0,0.3)');
+          animate(boxShadow, 'rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px');
         }
       } else {
         isActive = false;
