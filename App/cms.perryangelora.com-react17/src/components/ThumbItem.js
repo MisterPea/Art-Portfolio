@@ -15,6 +15,7 @@ export const ThumbItem = ({ thumb, deleteEntry, makeEdit, disabled }) => {
           height={100}
           width={100}
           layout='raw'
+          priority={true}
         />
         <div className='right-side'>
           <div className='text-holder'>

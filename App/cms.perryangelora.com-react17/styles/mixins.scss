@@ -12,9 +12,6 @@
   font-style: normal;
 }
 
-
-
-
 $tablet: 768px;
 $desktop: 2000px;
 
@@ -28,4 +25,8 @@ $desktop: 2000px;
   @media only screen and (min-width: #{$desktop}) {
     @content;
   }
+}
+
+:root {
+  --background: #f8f2e7;
 }
