@@ -1,7 +1,13 @@
 import { S3, S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 
 export default async function handler(req, res) {
-  const S3 = new S3Client({ region: 'us-east-1' });
+  
+  const S3 = new S3Client({
+    accessKeyId: process.env.AWS_S3_ACCESS,
+    secretAccessKey: process.env.AWS_S3_SECRET,
+    region: 'us-east-1'
+  });
+  
   const params = {
     Bucket: 'perryangelora.com',
     Key: 'cms/cms.json',
