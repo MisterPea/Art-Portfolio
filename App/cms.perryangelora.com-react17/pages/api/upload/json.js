@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         Bucket: 'perryangelora.com',
         Key: 'cms/cms.json',
       };
-      const S3 = new S3Client({region: 'us-east-1'});
+      const S3 = new S3Client({ region: 'us-east-1' });
       const command = new PutObjectCommand(params);  
       const fileBuffer = fs.readFileSync(files.file.filepath);
   
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
         resolve();
       })
         .catch((err) => {
-          res.status(418).json({success:err});
+          res.status(418).json({ success:err });
           resolve();
         });
     });
