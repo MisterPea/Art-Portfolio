@@ -5,10 +5,10 @@
   font-size: 1.2rem;
   align-items: center;
   label {
-    margin-right: 2px;
+    margin-right: 5px;
     ;
   }
-  input {
+  input, select{
     font-size: 1rem;
     border: none;
     border-radius: 2px;
@@ -16,7 +16,12 @@
     padding-left: 5px;
     flex:1;
     @include regular-text;
-    border-bottom: 0.5px solid black;
-
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.311);
+  }
+  
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
   }
 }

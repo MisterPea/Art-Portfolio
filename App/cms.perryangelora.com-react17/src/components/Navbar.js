@@ -3,9 +3,7 @@ import Button from './Button';
 import { useSession, signIn, signOut } from 'next-auth/react';
 
 export default function Navbar() {
-  const {data: session} = useSession();
-  // const a = useSession()
-  // console.log(a)
+  const { data: session } = useSession();
 
   const handleSignIn = () => signIn('github');
 

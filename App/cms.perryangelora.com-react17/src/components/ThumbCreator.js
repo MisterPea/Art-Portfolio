@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Button from './Button';
 import TextInput from './TextInput';
+import SingleOptionInput from './SingleOptionInput';
 import CircleButton from './CircleButton';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
@@ -451,8 +452,6 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
     document.getElementById('fileUpload').click();
   }
 
-  
-
   return (
     <div className='canvas-background'> 
       <div className="canvas-holder">
@@ -479,7 +478,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
           </canvas>
           <TextInput action={handleInputText} value={text.title} label="Title:" placeholder="Enter Title" />
           <TextInput action={handleInputText} value={text.medAndSize} label="Medium/Size:" placeholder="Enter Medium and Size" />
-          <TextInput action={handleInputText} value={text.gallery} label="Gallery:" placeholder="Enter Gallery Title" />
+          <SingleOptionInput action={handleInputText} value={text.gallery} label="Gallery:" placeholder="Enter Gallery Title" />
           <input
             className="magnification-slider"
             onChange={(e) => handleMag(e)}

@@ -1,15 +1,24 @@
 import Head from 'next/head';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Navbar from '../src/components/Navbar';
 import ThumbCreator from '../src/components/ThumbCreator';
 import ThumbDisplay from '../src/components/ThumbDisplay';
 import { S3, S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import ModalComponentWrapper from '../src/components/ModalComponentWrapper';
 import axios from 'axios';
+import Button from '../src/components/Button';
 
 export async function getServerSideProps() {
-  const S3 = new S3Client({ region: 'us-east-1' });
+  
+  const S3 = new S3Client({
+    accessKeyId: process.env.AWS_S3_ACCESS,
+    secretAccessKey: process.env.AWS_S3_SECRET,
+    region: 'us-east-1'
+  });
+
   const params = {
     Bucket: 'perryangelora.com',
     Key: 'cms/cms.json',
@@ -32,13 +41,33 @@ export async function getServerSideProps() {
 }
 
 export default function Home({ thumbContents }) { 
+  const { status } = useSession();
   const [edit, setEdit] = useState({ id:undefined, file:undefined, title:'', medAndSize:'', gallery:'', thumbXY:{ x:0, y:0 }, magnification:5 });
+  const [openErrorModal, setOpenErrorModal] = useState(false);
+  const year = new Date().getFullYear();
 
   const router = useRouter();
+  
   // Method to force a reload to trigger getServerSideProps
   function refreshData() {
     router.replace(router.asPath);
   }
+
+  useEffect(() => {
+    const query = router.query;
+    const queryKeys = Object.keys(query);
+    if(queryKeys) {
+      // if unauthenticated && accessDenied then show error modal.
+      if(query[queryKeys[0]] === 'AccessDenied' && status === 'unauthenticated') {
+        setOpenErrorModal(true);
+      }
+      // if authenticated && accessDenied then push change
+      if(query[queryKeys[0]] === 'AccessDenied' && status === 'authenticated') {
+        resetPath();
+      }
+     
+    }
+  }, [router.query, status]);
 
   /**
    * This serves as an intermediary between ThumbDisplay and ThumbCreator. On edit
@@ -62,6 +91,25 @@ export default function Home({ thumbContents }) {
     setEdit({ id:undefined, file:undefined, title:'', medAndSize:'', gallery:'', thumbXY:{ x:0, y:0 }, magnification:5 });
   }
 
+  function resetPath(){
+    router.replace('/');
+    if(openErrorModal === true) {
+      setOpenErrorModal(false);
+    }
+  }
+
+  function LoginError({ setModalOpen }){
+
+    return (
+      <>
+        <h1>You must be an authorized user to log in</h1>
+        <div className="button-wrapper">
+          <Button action={setModalOpen} label="Close" color="green" />
+        </div>
+      </>
+    );
+  }
+
   function deleteEntry(id){
     axios({
       method:'DELETE',
@@ -73,9 +121,14 @@ export default function Home({ thumbContents }) {
   
   return (
     <>
+      {openErrorModal && 
+        <ModalComponentWrapper close={resetPath}>
+          <LoginError />
+        </ModalComponentWrapper>}
       <Navbar />
       <ThumbCreator thumbs={thumbContents} refresh={refreshData} toEdit={edit} resetEdit={resetEditEntry} />
       <ThumbDisplay thumbs={thumbContents} makeEdit={editEntry} deleteEntry={deleteEntry} />
+      <footer>{`©${year} Perry Angelora`}</footer>
     </>
   );
 }

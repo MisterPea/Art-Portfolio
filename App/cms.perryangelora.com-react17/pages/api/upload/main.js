@@ -17,7 +17,13 @@ export default async function handler(req, res) {
         Bucket: 'perryangelora.com',
         Key: `cms/images/${files.file.originalFilename}`,
       };
-      const S3 = new S3Client({region: 'us-east-1'});
+      
+      const S3 = new S3Client({
+        accessKeyId: process.env.AWS_S3_ACCESS,
+        secretAccessKey: process.env.AWS_S3_SECRET,
+        region: 'us-east-1'
+      });
+
       const command = new PutObjectCommand(params);  
       const fileBuffer = fs.readFileSync(files.file.filepath);
       const url = await getSignedUrl(S3, command);
@@ -30,7 +36,7 @@ export default async function handler(req, res) {
         resolve();
       })
         .catch((err) => {
-          res.status(418).json({success:err});
+          res.status(418).json({ success:err });
           resolve();
         });
     });

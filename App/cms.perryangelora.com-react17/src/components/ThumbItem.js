@@ -15,15 +15,18 @@ export const ThumbItem = ({ thumb, deleteEntry, makeEdit, disabled }) => {
           height={100}
           width={100}
           layout='raw'
+          priority={true}
         />
-        <div className='text-holder'>
-          <h3>{thumb.name}</h3>
-          <h4>{thumb.medAndSize}</h4>
-          <p>{thumb.gallery}</p>
-        </div>
-        <div className='button-wrapper'>
-          <button disabled={disabled} onClick={() => deleteEntry(thumb.id)}>Delete</button>
-          <button onClick={() => makeEdit(thumb.id, thumb.mainFileName, thumb.name, thumb.medAndSize, thumb.gallery, thumb.thumbXY, thumb.magnification)}>Edit</button>
+        <div className='right-side'>
+          <div className='text-holder'>
+            <h3>{thumb.name}</h3>
+            <h4>{thumb.medAndSize}</h4>
+            <p>{thumb.gallery}</p>
+          </div>
+          <div className='button-wrapper'>
+            <button disabled={disabled} onClick={() => deleteEntry(thumb.id)}>Delete</button>
+            <button onClick={() => makeEdit(thumb.id, thumb.mainFileName, thumb.name, thumb.medAndSize, thumb.gallery, thumb.thumbXY, thumb.magnification)}>Edit</button>
+          </div>
         </div>
       </div>
 
