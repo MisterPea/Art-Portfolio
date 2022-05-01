@@ -1,4 +1,4 @@
-import { S3Client, DeleteObjectCommand} from '@aws-sdk/client-s3';
+import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 export default async function handler(req, res) {
   
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   };
 
   const deleted = await S3.send(new DeleteObjectCommand(thumbParams));
-  res.status(200).json({success: deleted.$metadata.httpStatusCode === 204});
+  res.status(200).json({ success: deleted.$metadata.httpStatusCode === 204 });
 }
 
 

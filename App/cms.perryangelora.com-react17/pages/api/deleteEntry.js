@@ -1,14 +1,14 @@
-import { S3Client, DeleteObjectCommand, PutObjectCommand} from '@aws-sdk/client-s3';
+import { S3Client, DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import axios from 'axios';
 
 export default async function handler(req, res) {
-  const {id, thumbContents} = req.body;
+  const { id, thumbContents } = req.body;
   const thumbs = JSON.parse(thumbContents);
   const fileNames = (() => {
     for(let i = 0; i < thumbs.length; i += 1) {
       if(thumbs[i].id === id) {
-        return {thumb: thumbs[i].thumbFileName, image: thumbs[i].mainFileName};
+        return { thumb: thumbs[i].thumbFileName, image: thumbs[i].mainFileName };
       }
     }
   })();
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
   }).then(() => {return true;})
     .catch((err) => console.log('FAIL:', err));
 
-  res.status(200).json({success: updateJSON && deleteImage.$metadata.httpStatusCode === 204 && deleteThumb.$metadata.httpStatusCode === 204})
+  res.status(200).json({ success: updateJSON && deleteImage.$metadata.httpStatusCode === 204 && deleteThumb.$metadata.httpStatusCode === 204 });
 
 }
 

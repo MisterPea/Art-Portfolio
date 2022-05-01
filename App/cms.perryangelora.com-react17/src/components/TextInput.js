@@ -1,4 +1,4 @@
-export default function TextInput({label, placeholder='', action, value}) {
+export default function TextInput({ label, placeholder='', action, value }) {
 
   return (
     <div className="text-input-group">
