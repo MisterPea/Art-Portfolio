@@ -1,0 +1,32 @@
+@import url("https://use.typekit.net/nsm4rjt.css");
+
+@mixin bold-text {
+  font-family: proxima-nova, sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+@mixin regular-text {
+  font-family: proxima-nova, sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+$tablet: 768px;
+$desktop: 2000px;
+
+@mixin tablet {
+  @media only screen and (min-width: #{$tablet}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media only screen and (min-width: #{$desktop}) {
+    @content;
+  }
+}
+
+:root {
+  --background: #f8f2e7;
+}
