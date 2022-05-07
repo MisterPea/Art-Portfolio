@@ -20,12 +20,12 @@ Todo:
 
 
 #### NextJS
-* [ ] `getStaticProps` to call s3 methods. Populate thumbnails and main image.
-* [ ] Grab JSON for file info
-* [ ] Image display via carousel run by framer-motion
-* [ ] Header component
+* [x] `getStaticProps` to call s3 methods. Populate thumbnails and main image.
+* [x] Grab JSON for file info
+* [x] Image display via carousel run by framer-motion
+* [x] Header component
 * [ ] About component
-* [ ] Thumbnail component
+* [x] Thumbnail component
 * [ ] Image presentation component - pinch zoom on mobile
 * [x] Upload thumbnail
 * [x] Upload main image
