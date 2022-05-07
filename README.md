@@ -17,6 +17,7 @@ Todo:
 * [x] Update database on reorder and before navigation away from site (if needed)
 * [ ] Will exist as a subdomain...updating site will trigger a rebuild via GitHub Actions maybe through [`repository_dispatch`](https://stackoverflow.com/questions/68147899/whats-is-the-difference-between-repository-dispatch-and-workflow-dispatch-in-git)
 * [x] Tablet/Desktop Layout
+* [x] Add components and plumbing to create a blurDataHash 
 
 
 #### NextJS
@@ -29,3 +30,4 @@ Todo:
 * [ ] Image presentation component - pinch zoom on mobile
 * [x] Upload thumbnail
 * [x] Upload main image
+* [x] Add decoding of blurDataHash to base64 jpeg
