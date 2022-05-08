@@ -7,6 +7,7 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import Loading from './Loading';
 import { useSession } from 'next-auth/react';
+import encodeBlurHash from './encodeBlurHash';
 
 /**
  * Component to create a thumbnail based on user upload and user scaling.
@@ -16,6 +17,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
   const [fileState, setFileState] = useState(null);
   const [text, setText] = useState({ title:'', medAndSize:'', gallery:'' });
   const [isIngesting, setIsIngesting] = useState(false);
+  const [disableUpload, setDisableUpload] = useState(false);
   const mag = useRef(5);
   const [mouseDown, setMouseDown] = useState(false);
   const canvas = useRef(null);
@@ -28,7 +30,9 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
   const reader = useRef();
   const accepted = '.jpg, .jpeg, .gif, .tiff, .tif, .webp, .png';
   const { data } = useSession();
- 
+  const blurHash = useRef(undefined);
+  const blurHashThumb = useRef(undefined);
+
   // Instantiate Canvas and FileReader. Note: within NextJS SSR, browser APIs
   // need to be placed in useEffect, so they are initiated on mount.
   useEffect(() => {
@@ -50,8 +54,8 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
     if (img.current) {
       img.current.onload = () => {
         clearAndDraw();
+        blurHash.current = encodeBlurHash(img.current);
       };
-
       if (fileState !== null) {
         img.current.src = fileState;
       }
@@ -66,6 +70,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
         url: 'api/getEditImage',
         data:{ url:`https://s3.amazonaws.com/perryangelora.com/cms/images/${file}` }
       }).then((data) => {
+        setDisableUpload(true);
         imageStartXY.current = (thumbXY);
         mag.current = magnification;
         document.querySelector('.magnification-slider').value = `${magnification * 10}`;
@@ -252,7 +257,6 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
    */
   function sendFilesForIngest(){
     const uuid = uuidv4();
-    const uploadComplete = { thumb: false, main: false, json: false };
     const thumbData = new FormData();
     const mainImgData = new FormData();
     const JsonData = new FormData();
@@ -262,78 +266,82 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
     setIsIngesting(true);
 
     const allUploadsComplete = () => {
-      if(Object.values(uploadComplete).every((e) => e === true)) {
-        setIsIngesting(false);
-        lowerCanvas.classList.remove('ingesting');
-        setFileState(null);
-        mag.current = 5;
-        setText({ title:'', medAndSize:'', gallery:'' });
-        refresh();
-      }
+      setIsIngesting(false);
+      lowerCanvas.classList.remove('ingesting');
+      setFileState(null);
+      mag.current = 5;
+      setText({ title:'', medAndSize:'', gallery:'' });
+      refresh();
     };
 
-    // Thumb Image Upload
-    canvas.current.toBlob((blob) => {
-      const img = new File([blob], `${uuid}_thumb.jpeg`, { type:'image/jpeg' });
-      thumbData.append('file', img, `${uuid}_thumb.jpeg`);
+    const uploadJSON = (resolve) => {
+      return new Promise((_, reject) => {
+        const extension = mainImage.current.name.split('.').pop();
+        const fileInfo = JSON.parse(thumbs);
+        const fileJson = {
+          order:`${text.gallery[0]}${fileInfo.length}`,
+          id: uuid,
+          name: text.title,
+          medAndSize: text.medAndSize,
+          thumbFileName: `${uuid}_thumb.jpeg`,
+          blurHashThumb: blurHashThumb.current,
+          mainFileName: `${uuid}.${extension}`,
+          blurHash: blurHash.current,
+          ratio: deriveImgDimensions(),
+          gallery: text.gallery,
+          thumbXY: imageStartXY.current,
+          magnification: mag.current,
+        };
+        fileInfo.push(fileJson);
+  
+        const jsonFile = new File([JSON.stringify(fileInfo, null, '\t')], 'cms.json', { type:'application/json' });
+        JsonData.append('file', jsonFile, 'cms.json');
+        axios({
+          method:'POST',
+          url:'api/upload/json',
+          data: JsonData,
+          headers: {
+            'Content-Type':'multipart/form-data'
+          }
+        }).then(() => resolve())
+          .catch((err) => reject(err));
+      });
+    };
+
+    const uploadThumb = new Promise((resolve, reject) => {
+      canvas.current.toBlob((blob) => {
+        const img = new File([blob], `${uuid}_thumb.jpeg`, { type:'image/jpeg' });
+        thumbData.append('file', img, `${uuid}_thumb.jpeg`);
+        blurHashThumb.current = encodeBlurHash(canvas.current, 50);
+        axios({
+          method:'POST',
+          url: 'api/upload/thumb',
+          data: thumbData,
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(() => uploadJSON(resolve))
+          .catch((err) => reject(err));
+      }, 'image/jpeg', 1.0);
+    });
+
+    const uploadMainImage = new Promise((resolve, reject) => {
+      const extension = mainImage.current.name.split('.').pop();
+      mainImgData.append('file', mainImage.current, `${uuid}.${extension}`);
       axios({
         method:'POST',
-        url: 'api/upload/thumb',
-        data: thumbData,
+        url: 'api/upload/main',
+        data: mainImgData,
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
         }
-      }).then(() => {
-        uploadComplete.thumb = true;
-        allUploadsComplete();;
-      }).catch((err) => console.log(err));
-    }, 'image/jpeg', 1.0);
-  
-    // Main Image Upload
-    const extension = mainImage.current.name.split('.').pop();
-    mainImgData.append('file', mainImage.current, `${uuid}.${extension}`);
-    axios({
-      method:'POST',
-      url: 'api/upload/main',
-      data: mainImgData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
-    }).then(() => {
-      uploadComplete.main = true;
-      allUploadsComplete();
-    })
-      .catch((err) => console.log(err));
-
-    const fileInfo = JSON.parse(thumbs);
-    const fileJson = {
-      order:`${text.gallery[0]}${fileInfo.length}`,
-      id: uuid,
-      name: text.title,
-      medAndSize: text.medAndSize,
-      thumbFileName: `${uuid}_thumb.jpeg`,
-      mainFileName: `${uuid}.${extension}`,
-      gallery: text.gallery,
-      thumbXY: imageStartXY.current,
-      magnification: mag.current,
-    };
-    fileInfo.push(fileJson);
-
-    const jsonFile = new File([JSON.stringify(fileInfo, null, '\t')], 'cms.json', { type:'application/json' });
-    JsonData.append('file', jsonFile, 'cms.json');
-    axios({
-      method:'POST',
-      url:'api/upload/json',
-      data: JsonData,
-      headers: {
-        'Content-Type':'multipart/form-data'
-      }
-    }).then(() => {
-      uploadComplete.json = true;
-      allUploadsComplete();
-    })
-      .catch((err) => console.log(err));
+      }).then(() => resolve())
+        .catch((err) => reject(err));
+    });
+    
+    Promise.all([uploadThumb, uploadMainImage]).then(() => allUploadsComplete()).catch((err)=> console.error(err));
   }
+
   /**
    * Method to update the text and/or thumbnail image.
    * The JSON file will be update and a new thumbnail will be created with each instance
@@ -342,89 +350,96 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
     const uuid = uuidv4();
     const JsonData = new FormData();
     const thumbData = new FormData();
-    const uploadComplete = { thumb: false, json: false, deleteOldThumb: false };
+    let fileToDelete = undefined;
 
     const lowerCanvas = document.querySelector('.lower-canvas-holder');
     lowerCanvas.classList.add('ingesting');
     setIsIngesting(true);
 
     const allUploadsComplete = () => {
-      if(Object.values(uploadComplete).every((e) => e === true)) {
-        setIsIngesting(false);
-        lowerCanvas.classList.remove('ingesting');
-        setFileState(null);
-        mag.current = 5;
-        setText({ title:'', medAndSize:'', gallery:'' });
-        resetEdit();
-        refresh();
-      }
+      setIsIngesting(false);
+      lowerCanvas.classList.remove('ingesting');
+      setFileState(null);
+      mag.current = 5;
+      setText({ title:'', medAndSize:'', gallery:'' });
+      disableUpload === true && setDisableUpload(false);
+      resetEdit();
+      refresh();
     };
 
     const deleteThumb = (filename) => {
-      axios({
-        method:'DELETE',
-        url:'api/deleteThumb',
-        data: filename
-      }).then(() => {
-        uploadComplete.deleteOldThumb = true;
-        allUploadsComplete();
+      return new Promise((resolve, reject) => {
+        axios({
+          method:'DELETE',
+          url:'api/deleteThumb',
+          data: filename
+        }).then(() => resolve())
+          .catch((err) => reject(err));
       });
     };
 
+    const uploadJSON = (resolve) => {
+      return new Promise((_, reject) => {
+        const fileInfo = JSON.parse(thumbs);
+        const newFileInfo = fileInfo.map((element) => {
+          if(element.id === toEdit.id){
+            fileToDelete = element.thumbFileName;
+            return {
+              order: element.order,
+              id: element.id,
+              name: text.title,
+              medAndSize: text.medAndSize,
+              thumbFileName: `${uuid}_thumb.jpeg`,
+              blurHashThumb: blurHashThumb.current,
+              mainFileName: element.mainFileName,
+              blurHash: blurHash.current,
+              ratio: deriveImgDimensions(),
+              gallery: text.gallery,
+              thumbXY: imageStartXY.current,
+              magnification: mag.current,
+            };
+          } else {
+            return element;
+          }
+        });
+    
+        const jsonFile = new File([JSON.stringify(newFileInfo, null, '\t')], 'cms.json', { type:'application/json' });
+        JsonData.append('file', jsonFile, 'cms.json');
+        axios({
+          method:'POST',
+          url:'api/upload/json',
+          data: JsonData,
+          headers: {
+            'Content-Type':'multipart/form-data'
+          }
+        }).then(() => resolve())
+          .catch((err) => reject(err));
+      });
+    };
+   
     // Thumb Upload
-    canvas.current.toBlob((blob) => {
-      console.log(`${toEdit.id}_thumb.jpeg`);
-      const img = new File([blob], `${uuid}_thumb.jpeg`, { type:'image/jpeg' });
-      thumbData.append('file', img, `${uuid}_thumb.jpeg`);
-      axios({
-        method:'POST',
-        url: 'api/upload/thumb',
-        data: thumbData,
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).then(() => {
-        uploadComplete.thumb = true;
-        allUploadsComplete();
-      }).catch((err) => console.log(err));
-    }, 'image/jpeg', 1.0);
-
-    const fileInfo = JSON.parse(thumbs);
-    const newFileInfo = fileInfo.map((element) => {
-      if(element.id === toEdit.id){
-        deleteThumb(element.thumbFileName);
-        return {
-          order: element.order,
-          id: element.id,
-          name: text.title,
-          medAndSize: text.medAndSize,
-          thumbFileName: `${uuid}_thumb.jpeg`,
-          mainFileName: element.mainFileName,
-          gallery: text.gallery,
-          thumbXY: imageStartXY.current,
-          magnification: mag.current,
-        };
-      } else {
-        return element;
-      }
+    const uploadThumb = new Promise((resolve, reject) => {
+      canvas.current.toBlob((blob) => {
+        const img = new File([blob], `${uuid}_thumb.jpeg`, { type:'image/jpeg' });
+        thumbData.append('file', img, `${uuid}_thumb.jpeg`);
+        blurHashThumb.current = encodeBlurHash(canvas.current, 50);
+        axios({
+          method:'POST',
+          url: 'api/upload/thumb',
+          data: thumbData,
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(() => uploadJSON(resolve))
+          .catch((err) => reject(err));
+      }, 'image/jpeg', 1.0);
     });
 
-    const jsonFile = new File([JSON.stringify(newFileInfo, null, '\t')], 'cms.json', { type:'application/json' });
-    JsonData.append('file', jsonFile, 'cms.json');
-    axios({
-      method:'POST',
-      url:'api/upload/json',
-      data: JsonData,
-      headers: {
-        'Content-Type':'multipart/form-data'
-      }
-    }).then(() => {
-      uploadComplete.json = true;
-      allUploadsComplete();
-    })
-      .catch((err) => console.log(err));
+    uploadThumb.then(() => {
+      return deleteThumb(fileToDelete);
+    }).then(() => allUploadsComplete())
+      .catch((err) => console.error(err));
   }
-
 
   function handleInputText(e) {
     if(e.target.id === 'Title:') {
@@ -442,6 +457,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
   function handleCloseButton() {
     setText({ title:'', medAndSize:'', gallery:'' });
     setFileState(null);
+    disableUpload === true && setDisableUpload(false);
   }
 
   function handleUploadClick() {
@@ -451,12 +467,12 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
     document.querySelector('.magnification-slider').value = '30';
     document.getElementById('fileUpload').click();
   }
-
+  console.log('disable button', disableUpload);
   return (
     <div className='canvas-background'> 
       <div className="canvas-holder">
         <div className={`top-buttons-bar ${fileState ? 'active' : ''}`}>
-          <Button label="Upload Image" action={handleUploadClick} />
+          <Button label="Upload Image" disabled={disableUpload} action={handleUploadClick} />
           <CircleButton clickHandle={handleCloseButton} />
           <input id="fileUpload" onChange={(e) => addImage(e)} type="file" accept={accepted} />
         </div>

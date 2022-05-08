@@ -1,6 +1,6 @@
 import { encode } from 'blurhash';
 
-export default function encodeBlurHash(image){
+export default function encodeBlurHash(image, dimensions=400){
 
   const imageData = (() => {
     const canvas = document.createElement('CANVAS');
@@ -16,8 +16,8 @@ export default function encodeBlurHash(image){
       imageRatio.h = 1 / ratio;
       imageRatio.w = 1;
     }
-    const newWidth = imageRatio.w * 400;
-    const newHeight = imageRatio.h * 400; 
+    const newWidth = imageRatio.w * dimensions;
+    const newHeight = imageRatio.h * dimensions; 
 
     canvas.width = newWidth;
     canvas.height = newHeight;

@@ -13,14 +13,13 @@ export default function ThumbDisplay({ thumbs, makeEdit, deleteEntry }) {
   const prevThumbs = useRef([]);
   const  authData = useSession();
   
-  
   useEffect(() => {
     const parsedThumbs = JSON.parse(thumbs);
     if(parsedThumbs.length > 0) {
       setAllThumbElements(parsedThumbs);
       prevThumbs.current = parsedThumbs;
-      setMonoThumbElements(parsedThumbs.filter((e) => e.gallery === 'mono'));
-      setPolyThumbElements(parsedThumbs.filter((e) => e.gallery === 'poly'));
+      setMonoThumbElements(parsedThumbs.filter((e) => e.gallery === 'monochrome'));
+      setPolyThumbElements(parsedThumbs.filter((e) => e.gallery === 'polychrome'));
     }
   }, [thumbs]);
 
@@ -49,8 +48,8 @@ export default function ThumbDisplay({ thumbs, makeEdit, deleteEntry }) {
    * So when individual galleries are reordered, changes are propagated to the main
    * group of thumbs.
    */
-  usePropagateReorder(monoThumbElements, allThumbElements, setAllThumbElements, currentGallery, 'mono');
-  usePropagateReorder(polyThumbElements, allThumbElements, setAllThumbElements, currentGallery, 'poly');
+  usePropagateReorder(monoThumbElements, allThumbElements, setAllThumbElements, currentGallery, 'monochrome');
+  usePropagateReorder(polyThumbElements, allThumbElements, setAllThumbElements, currentGallery, 'polychrome');
 
   function writeJson() {
     // pull out order numbers and compare
@@ -73,8 +72,8 @@ export default function ThumbDisplay({ thumbs, makeEdit, deleteEntry }) {
 
   useEffect(() => {
     if(currentGallery === 'all') {
-      setMonoThumbElements(allThumbElements.filter((e) => e.gallery === 'mono'));
-      setPolyThumbElements(allThumbElements.filter((e) => e.gallery === 'poly'));
+      setMonoThumbElements(allThumbElements.filter((e) => e.gallery === 'monochrome'));
+      setPolyThumbElements(allThumbElements.filter((e) => e.gallery === 'polychrome'));
     }
   }, [allThumbElements]);
 
@@ -89,16 +88,16 @@ export default function ThumbDisplay({ thumbs, makeEdit, deleteEntry }) {
           <div className='thumb-nav'>
             <ul onClick={handleChangeGallery}>
               <li className='nav-li' id='all'>All</li>
-              <li className='nav-li' id='mono'>Mono</li>
-              <li className='nav-li' id='poly'>Poly</li>
+              <li className='nav-li' id='monochrome'>Monochrome</li>
+              <li className='nav-li' id='polychrome'>Polychrome</li>
             </ul>
 
           </div>
           <p className='drag-instruct'>Drag to Re-order</p>
           <AnimatePresence>
             {currentGallery === 'all' && <ReorderComponent values={allThumbElements} onReorder={setAllThumbElements} makeEdit={makeEdit} deleteEntry={deleteEntry} authData={authData} /> }
-            {currentGallery === 'mono' && <ReorderComponent values={monoThumbElements} onReorder={setMonoThumbElements} makeEdit={makeEdit} deleteEntry={deleteEntry} authData={authData} /> }
-            {currentGallery === 'poly' && <ReorderComponent values={polyThumbElements} onReorder={setPolyThumbElements} makeEdit={makeEdit} deleteEntry={deleteEntry} authData={authData} /> }
+            {currentGallery === 'monochrome' && <ReorderComponent values={monoThumbElements} onReorder={setMonoThumbElements} makeEdit={makeEdit} deleteEntry={deleteEntry} authData={authData} /> }
+            {currentGallery === 'polychrome' && <ReorderComponent values={polyThumbElements} onReorder={setPolyThumbElements} makeEdit={makeEdit} deleteEntry={deleteEntry} authData={authData} /> }
           </AnimatePresence>
         </>
     }</div>
