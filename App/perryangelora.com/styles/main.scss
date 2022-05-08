@@ -1,0 +1,46 @@
+@import "./mixins.scss";
+@import "./navbar.scss";
+@import "./gallery.scss";
+
+html,
+body {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+button {
+  border: none;
+  background: none;
+}
+
+html {
+  background-color: var(--background);
+  font-size: 16px;
+}
+
+footer {
+  text-align: center;
+  @include regular-text;
+  font-size: 0.75rem;
+  margin-bottom: 10px;
+}

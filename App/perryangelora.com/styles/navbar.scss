@@ -1,0 +1,58 @@
+.nav-header {
+  margin-top: 10px;
+  padding: 8px 25px;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+
+  h1 {
+    @include bold-text;
+    font-size: 1.75rem;
+    line-height: 1.75rem;
+    letter-spacing: 0.0125em;
+    width: fit-content;
+  }
+
+  menu {
+    margin: 0;
+    margin-top: -5px;
+    @include regular-text;
+    a {
+      display: block;
+      cursor: pointer;
+      position: relative;
+      width: fit-content;
+      font-size: 1.3rem;
+      line-height: 2rem;
+      text-decoration: none;
+      color: #000;
+      &.about {
+        display: none;
+      }
+      &.active {
+        color: #7d7d7d;
+        &::before {
+          content: "";
+          position: absolute;
+          width: 120%;
+          top: 50%;
+          left: -10%;
+          border-bottom: 0.5px solid black;
+          animation: line 200ms ease-in-out;
+        }
+        @keyframes line {
+          0% {
+            width: 0;
+          }
+          100% {
+            width: 120%;
+          }
+        }
+      }
+      // &:hover {
+      //     text-decoration: line-through;
+      //     text-decoration-thickness: 0.5px;
+      // }
+    }
+  }
+}
