@@ -10,13 +10,15 @@ import { useEffect } from 'react';
  */
 export default function usePropagateReorder(galleryThumbState, allThumbState, setAllThumbState, currentGallery, galleryString){
   useEffect(() => {
+    
     if (galleryThumbState.length > 0 && currentGallery === galleryString) {
+      
       const galleryInitial = galleryString[0];
       let gallery_i = -1;
       const newAllThumbs = allThumbState.map((elem, i) => {
         if(elem.gallery[0] === galleryInitial) {
           gallery_i += 1;
-          return { ...galleryThumbState[gallery_i], order:`${galleryInitial}${i}` };
+          return { ...galleryThumbState[gallery_i], order:`${galleryInitial}-temp-${i}` };
         } else {
           return elem;
         }

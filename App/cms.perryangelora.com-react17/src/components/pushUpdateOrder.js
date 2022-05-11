@@ -7,6 +7,7 @@ import axios from 'axios';
  */
 export default function pushUpdateOrder(currThumbs, prevThumbs){
   const JsonData = new FormData();
+ 
 
   // reset the order numbering to 0 - n
   const newThumbArray = currThumbs.map((thumb, index) => {
@@ -23,6 +24,7 @@ export default function pushUpdateOrder(currThumbs, prevThumbs){
       'Content-Type':'multipart/form-data'
     }
   }).then(() => {
+    console.log('Change Complete');
     prevThumbs.current = newThumbArray;
   })
     .catch((err) => console.log(err));

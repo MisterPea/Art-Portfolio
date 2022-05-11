@@ -11,7 +11,7 @@ export default function ThumbDisplay({ thumbs, makeEdit, deleteEntry }) {
   const [polyThumbElements, setPolyThumbElements] = useState([]);
   const [currentGallery, setCurrentGallery] = useState('all');
   const prevThumbs = useRef([]);
-  const  authData = useSession();
+  const authData = useSession();
   
   useEffect(() => {
     const parsedThumbs = JSON.parse(thumbs);
@@ -55,6 +55,7 @@ export default function ThumbDisplay({ thumbs, makeEdit, deleteEntry }) {
     // pull out order numbers and compare
     const prevOrder = prevThumbs.current.map((elem) => elem.order).join('');
     const currOrder = allThumbElements.map((elem) => elem.order).join('');
+
     const compareStates = prevOrder === currOrder;
     if(!compareStates && authData.status === 'authenticated') {
       pushUpdateOrder(allThumbElements, prevThumbs);
@@ -87,7 +88,7 @@ export default function ThumbDisplay({ thumbs, makeEdit, deleteEntry }) {
         <>
           <div className='thumb-nav'>
             <ul onClick={handleChangeGallery}>
-              <li className='nav-li' id='all'>All</li>
+              <li className='nav-li active' id='all'>All</li>
               <li className='nav-li' id='monochrome'>Monochrome</li>
               <li className='nav-li' id='polychrome'>Polychrome</li>
             </ul>

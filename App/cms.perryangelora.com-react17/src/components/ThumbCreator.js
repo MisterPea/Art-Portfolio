@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Loading from './Loading';
 import { useSession } from 'next-auth/react';
 import encodeBlurHash from './encodeBlurHash';
+import blurDataToBase64 from './blurDataToBase64';
 
 /**
  * Component to create a thumbnail based on user upload and user scaling.
@@ -31,7 +32,9 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
   const accepted = '.jpg, .jpeg, .gif, .tiff, .tif, .webp, .png';
   const { data } = useSession();
   const blurHash = useRef(undefined);
-  const blurHashThumb = useRef(undefined);
+  const blurDataThumb = useRef(undefined);
+  const [makeCanvasActive, setMakeCanvasActive] = useState(false);
+  const [loadingStripe, setLoadingStripe] = useState(false);
 
   // Instantiate Canvas and FileReader. Note: within NextJS SSR, browser APIs
   // need to be placed in useEffect, so they are initiated on mount.
@@ -51,6 +54,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
 
   // Run on fileState/load change
   useEffect(() => {
+
     if (img.current) {
       img.current.onload = () => {
         clearAndDraw();
@@ -58,12 +62,20 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
       };
       if (fileState !== null) {
         img.current.src = fileState;
+        // Here, we're checking to see when the image is appended to the DOM.
+        // We're placing it behind the if statement for when the image is closed.
+        img.current.decode().then(() => {
+          setMakeCanvasActive(true);
+          setLoadingStripe(false);
+        });
       }
     }
   }, [fileState]);
 
+  // Runs on edit
   useEffect(() => {
     if(toEdit.file) {
+      setLoadingStripe(true);
       const { file, title, medAndSize, gallery, thumbXY, magnification } = toEdit;
       axios({
         method:'POST',
@@ -233,12 +245,15 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
       (windowSize.w * w * mag.current).toFixed(2), (windowSize.h * h * mag.current).toFixed(2));
   }
 
+
+
   /**
    * Method to take an uploaded allow it to be used as an `<img>` in a Canvas object, and to be uploaded elsewhere.
    * @param {*} e 
    */
   function addImage(e) {
     if (e.target.files && e.target.files[0]) {
+      setLoadingStripe(true);
       mainImage.current = e.target.files[0];
       reader.current.readAsDataURL(e.target.files[0]);
       reader.current.addEventListener('load', addImage);
@@ -271,6 +286,9 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
       setFileState(null);
       mag.current = 5;
       setText({ title:'', medAndSize:'', gallery:'' });
+      resetEdit();
+      ctx.current.clearRect(0, 0, windowSize.h, windowSize.w);
+      setMakeCanvasActive(false);
       refresh();
     };
 
@@ -284,7 +302,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
           name: text.title,
           medAndSize: text.medAndSize,
           thumbFileName: `${uuid}_thumb.jpeg`,
-          blurHashThumb: blurHashThumb.current,
+          blurDataThumb: blurDataThumb.current,
           mainFileName: `${uuid}.${extension}`,
           blurHash: blurHash.current,
           ratio: deriveImgDimensions(),
@@ -312,7 +330,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
       canvas.current.toBlob((blob) => {
         const img = new File([blob], `${uuid}_thumb.jpeg`, { type:'image/jpeg' });
         thumbData.append('file', img, `${uuid}_thumb.jpeg`);
-        blurHashThumb.current = encodeBlurHash(canvas.current, 50);
+        blurDataThumb.current = blurDataToBase64(encodeBlurHash(canvas.current, 50), 1, 1, 25);
         axios({
           method:'POST',
           url: 'api/upload/thumb',
@@ -363,6 +381,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
       mag.current = 5;
       setText({ title:'', medAndSize:'', gallery:'' });
       disableUpload === true && setDisableUpload(false);
+      setMakeCanvasActive(false);
       resetEdit();
       refresh();
     };
@@ -390,7 +409,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
               name: text.title,
               medAndSize: text.medAndSize,
               thumbFileName: `${uuid}_thumb.jpeg`,
-              blurHashThumb: blurHashThumb.current,
+              blurDataThumb: blurDataThumb.current,
               mainFileName: element.mainFileName,
               blurHash: blurHash.current,
               ratio: deriveImgDimensions(),
@@ -422,7 +441,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
       canvas.current.toBlob((blob) => {
         const img = new File([blob], `${uuid}_thumb.jpeg`, { type:'image/jpeg' });
         thumbData.append('file', img, `${uuid}_thumb.jpeg`);
-        blurHashThumb.current = encodeBlurHash(canvas.current, 50);
+        blurDataThumb.current = blurDataToBase64(encodeBlurHash(canvas.current, 50), 1, 1, 25);
         axios({
           method:'POST',
           url: 'api/upload/thumb',
@@ -457,6 +476,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
   function handleCloseButton() {
     setText({ title:'', medAndSize:'', gallery:'' });
     setFileState(null);
+    setMakeCanvasActive(false);
     disableUpload === true && setDisableUpload(false);
   }
 
@@ -467,17 +487,17 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
     document.querySelector('.magnification-slider').value = '30';
     document.getElementById('fileUpload').click();
   }
-  console.log('disable button', disableUpload);
+
   return (
     <div className='canvas-background'> 
       <div className="canvas-holder">
-        <div className={`top-buttons-bar ${fileState ? 'active' : ''}`}>
-          <Button label="Upload Image" disabled={disableUpload} action={handleUploadClick} />
+        <div className={`top-buttons-bar ${makeCanvasActive ? 'active' : ''}`}>
+          <Button label="Upload Image" disabled={disableUpload} action={handleUploadClick} isLoading={loadingStripe}/>
           <CircleButton clickHandle={handleCloseButton} />
           <input id="fileUpload" onChange={(e) => addImage(e)} type="file" accept={accepted} />
         </div>
         {isIngesting && <Loading />}
-        <div className={`lower-canvas-holder ${fileState ? 'active' : ''}`}>
+        <div className={`lower-canvas-holder ${makeCanvasActive ? 'active' : ''}`}>
           <canvas
             onTouchMove={handleTouchMove}
             onTouchStart={handleTouchDown}

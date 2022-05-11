@@ -18,10 +18,15 @@
     justify-content: space-between;
     .main-rect-button {
       margin: 0 auto;
+      transition: all 0.3s ease-in-out;
       &:disabled {
         cursor:not-allowed;
         color: rgba(0, 0, 0, 0.2);
         border: rgba(0, 0, 0, 0.2) 0.5px solid;
+        &.loading {
+          color: #000;
+          border: #000 0.5px solid;
+        }
       }
     }
 

@@ -24,6 +24,29 @@
     font-size: 1rem;
     width: 20rem;
   }
+  &.loading {
+    color: black;
+    background-image: 
+    repeating-linear-gradient(
+      45deg, 
+      transparent, 
+      transparent 0.5rem,
+      rgba(111, 170, 102, 0.3) 0.5rem,
+      rgba(111, 170, 102, 0.3) 1rem
+    );
+  background-size: 190% 190%;
+  animation: loadStripe 20s linear infinite;
+}
+
+@keyframes loadStripe {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+  
 }
 
 .circle-button {
