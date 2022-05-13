@@ -107,8 +107,6 @@ export default function GalleryGuts({ galleryJSON }){
             <ImageDisplay images={mainImages} closeModal={closeModal}/>
           </motion.div>}
       </AnimatePresence>
-      
     </>
-
   );
 }

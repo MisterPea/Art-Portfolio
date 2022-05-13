@@ -1,7 +1,7 @@
-import GalleryGuts from './src/galleryGuts';
+import GalleryGuts from './../src/GalleryGuts';
 import { motion } from 'framer-motion';
-import { galleryVariant } from './src/galleryVariants';
-import jsonDoc from '../public/cms/cms.json';
+import { galleryVariant } from './../src/galleryVariants';
+import jsonDoc from './../public/cms/cms.json';
 
 
 export default function Monochrome(){

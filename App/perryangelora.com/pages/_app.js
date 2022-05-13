@@ -1,5 +1,5 @@
-import Navbar from './src/Navbar';
-import '../styles/main.scss';
+import Navbar from './../src/Navbar';
+import './../styles/main.scss';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
