@@ -21,13 +21,17 @@ Todo:
 
 
 #### NextJS
-* [x] `getStaticProps` to call s3 methods. Populate thumbnails and main image.
+* [x] ~~`getStaticProps` to call s3 methods. Populate thumbnails and main image.
+* [x] Import images and data through local folder 
 * [x] Grab JSON for file info
 * [x] Image display via carousel run by framer-motion
 * [x] Header component
-* [ ] About component
+* [x] About component
 * [x] Thumbnail component
 * [ ] Image presentation component - pinch zoom on mobile
 * [x] Upload thumbnail
 * [x] Upload main image
+* [x] Arrow navigation - Esc to close modal
 * [x] Add decoding of blurDataHash to base64 jpeg
+* [ ] Add Favicon
+* [ ] Add Head(s) and optimize caching
