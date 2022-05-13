@@ -2,7 +2,7 @@ Fine Art Portfolio
 ---
 This repository consists of two parts:
 * A SSR desktop-only CMS system
-* A SSG portfolio website
+* A SSR portfolio website
 
 Todo:
 #### CMS - NextJS SSR - Concived for desktop use only. 
