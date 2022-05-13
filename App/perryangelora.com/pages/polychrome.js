@@ -1,19 +1,11 @@
 import GalleryGuts from '../src/galleryGuts';
 import { motion } from 'framer-motion';
 import { galleryVariant } from '../src/galleryVariants';
+import jsonDoc from '../public/cms/cms.json';
 
-export async function getStaticProps(){
-  const res = await fetch('https://s3.amazonaws.com/perryangelora.com/cms/cms.json');
-  const jsonDoc = await res.json();
-  const polyJson = await jsonDoc.filter((thumb) => thumb.gallery === 'polychrome');
-  return {
-    props: {
-      polyJson
-    }
-  };
-}
+export default function Polychrome(){
+  const polyJson = jsonDoc.filter((thumb) => thumb.gallery === 'polychrome');
 
-export default function Polychrome({ polyJson }){
   return (
     <motion.div
       initial={galleryVariant.galleryStart}
