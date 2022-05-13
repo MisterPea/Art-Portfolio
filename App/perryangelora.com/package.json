@@ -10,8 +10,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "blurhash": "^1.1.5",
     "framer-motion": "^6.3.3",
     "next": "12.1.4",
+    "popmotion": "^11.0.3",
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "react-icons": "^4.3.1"
