@@ -4,19 +4,33 @@
   flex-wrap: wrap;
   margin: 0 20px;
   justify-content: center;
+  @include desktop {
+    margin: 0 30px;
+  }
 
   .gallery-item {
-    flex-basis: 150px;
-    height: 150px;
-    width: 150px;
-    margin: 15px;
+    flex-basis: 160px;
+    height: 160px;
+    width: 160px;
+    margin: 10px;
     cursor: pointer;
+    border: solid 0.5px rgba(0, 0, 0, 0.20);
+    border-radius: 3px;
+    @include tablet {
+      margin: 20px;
+    }
+    @include desktop {
+      flex-basis: 150px;
+      height: 150px;
+      width: 150px;
+      margin: 30px;
+    }
   }
 }
 
 img {
   transition: all 0.7s ease-in-out;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 // Image Display
@@ -59,15 +73,15 @@ button {
   width: 100%;
   display: flex;
   align-items: center;
+  margin-top: -10px;
   justify-content: center;
-  // position: relative;
-  // padding: 100px;
 }
 
 .inner-image-wrap {
   display: block;
+
   @include tablet {
-    padding: 20px;
+    padding: 10px;
   }
 }
 
@@ -113,6 +127,7 @@ button {
 }
 
 .modal-whole {
+  // position: relative;
   background-color: #f8f2e7f1;
   position: fixed;
   height: 100%;

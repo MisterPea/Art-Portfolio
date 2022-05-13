@@ -1,6 +1,7 @@
 @import "./mixins.scss";
 @import "./navbar.scss";
 @import "./gallery.scss";
+@import "./bio.scss";
 
 html,
 body {
@@ -36,11 +37,43 @@ button {
 html {
   background-color: var(--background);
   font-size: 16px;
+  scroll-behavior: smooth;
+  &.modal-open {
+    overflow: hidden;
+    // ios is not working with overflow: hidden alone.
+    @supports (-webkit-overflow-scrolling : none) {
+      position: fixed;
+    }
+  }
+}
+
+.main-body {
+  height: 100%;
+  @media (hover: none) {
+    min-height: 101vh;
+  }
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 footer {
   text-align: center;
   @include regular-text;
-  font-size: 0.75rem;
-  margin-bottom: 10px;
+  margin-bottom: 1px;
+  margin-top: auto;
+  padding: 12px 0;
+  .about-bottom {
+    font-size: 1.25rem;
+    text-decoration: none;
+    color: black;
+    @include tablet {
+      display: none;
+    }
+  }
+
+  .date {
+    margin-top: 8px;
+    font-size: 0.75rem;
+  }
 }

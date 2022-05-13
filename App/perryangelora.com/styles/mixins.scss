@@ -12,8 +12,8 @@
   font-style: normal;
 }
 
-$tablet: 768px;
-$desktop: 2000px;
+$tablet: 940px;
+$desktop: 1200px;
 
 @mixin tablet {
   @media only screen and (min-width: #{$tablet}) {
