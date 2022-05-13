@@ -1,9 +1,9 @@
 import { decode } from 'blurhash';
 
-export default function blurDataToBase64(blurHash, widthRatio, heightRatio) {
+export default function blurDataToBase64(blurHash, widthRatio, heightRatio, sizeMultiple=40) {
 
   return (() => {
-    const size = { w: Math.trunc(widthRatio * 40), h: Math.trunc(heightRatio * 40) };
+    const size = { w: Math.trunc(widthRatio * sizeMultiple), h: Math.trunc(heightRatio * sizeMultiple) };
     const pixels = decode(blurHash, size.w, size.h, 1);
     const canvas = document.createElement('CANVAS');
     canvas.width = size.w;
