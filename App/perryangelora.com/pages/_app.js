@@ -1,4 +1,4 @@
-import Navbar from '../src/Navbar';
+import Navbar from './src/Navbar';
 import '../styles/main.scss';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';

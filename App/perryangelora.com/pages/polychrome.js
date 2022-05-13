@@ -1,6 +1,6 @@
-import GalleryGuts from '../src/galleryGuts';
+import GalleryGuts from './src/galleryGuts';
 import { motion } from 'framer-motion';
-import { galleryVariant } from '../src/galleryVariants';
+import { galleryVariant } from './src/galleryVariants';
 import jsonDoc from '../public/cms/cms.json';
 
 export default function Polychrome(){
