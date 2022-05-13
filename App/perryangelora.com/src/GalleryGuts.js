@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ImageDisplay from './ImageDisplay';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -14,15 +14,19 @@ import { motion, AnimatePresence } from 'framer-motion';
  * @return {JSX} Returns a JSX component
  */
 export default function GalleryGuts({ galleryJSON }){
-
+  const mainBody = useRef(undefined);
   const [mainImages, setMainImages] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    mainBody.current = document.querySelector(':root');
+  }, []);
+
+  useEffect(() => {
     const queryLength = Object.keys(router.query);
     if(queryLength.length > 0 && !openModal ){
-      setOpenModal(true);
+      launchModal();
     }
   }, [router.query]);
 
@@ -44,6 +48,12 @@ export default function GalleryGuts({ galleryJSON }){
   function closeModal() {
     setOpenModal(false);
     router.push(router.pathname, undefined, { shallow: true });
+    mainBody.current.classList.remove('modal-open');
+  }
+
+  function launchModal(){
+    setOpenModal(true);
+    mainBody.current.classList.add('modal-open');
   }
 
   const modalAnimation = {
