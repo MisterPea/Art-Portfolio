@@ -26,13 +26,13 @@ export default function Navbar() {
       <h1>Perry<br />Angelora</h1>
       <menu>
         <Link href="/monochrome">
-          <a className={`${setClass('menu-li monochrome')}`}>Monochrome</a>
+          <a tabIndex={0} className={`${setClass('menu-li monochrome')}`}>Monochrome</a>
         </Link>
         <Link href="/polychrome">
-          <a className={`${setClass('menu-li polychrome')}`}>Polychrome</a>
+          <a tabIndex={0} className={`${setClass('menu-li polychrome')}`}>Polychrome</a>
         </Link>
         <Link href="/about">
-          <a className={`${setClass('menu-li about')}`}>About</a>
+          <a tabIndex={0} className={`${setClass('menu-li about')}`}>About</a>
         </Link>
       </menu>
     </div>

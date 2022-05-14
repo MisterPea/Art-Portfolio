@@ -56,6 +56,13 @@ export default function GalleryGuts({ galleryJSON }){
     mainBody.current.classList.add('modal-open');
   }
 
+  function handleEnterKey(e, id) {
+
+    if(e.key === 'Enter') {
+      viewImagePath(id);
+    }
+  }
+
   const modalAnimation = {
     open: {
       opacity: 1,
@@ -80,8 +87,10 @@ export default function GalleryGuts({ galleryJSON }){
       <ul className='gallery-ul'>{
         galleryJSON.map((elem ) => (
           <li
+            tabIndex={0}
             className="gallery-item"
             key={elem.id}
+            onKeyDown={(e) => handleEnterKey(e, elem.id)}
             onClick={() => viewImagePath(elem.id)}
           >
             <Image 
