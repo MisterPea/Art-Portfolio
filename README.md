@@ -1,8 +1,12 @@
-Fine Art Portfolio
+Fine Art Portfolio with Simple CMS
 ---
+
 This repository consists of two parts:
 * A SSR desktop-only CMS system
 * A SSR portfolio website
+
+#### The CMS is available here: [https://cms.perryangelora.com](https://cms.perryangelora.com)
+#### The website is available here: [https://perryangelora.com](https://perryangelora.com)
 
 Todo:
 #### CMS - NextJS SSR - Concived for desktop use only. 
