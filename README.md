@@ -17,7 +17,9 @@ Todo:
 * [x] Update database on reorder and before navigation away from site (if needed)
 * [ ] Will exist as a subdomain...updating site will trigger a rebuild via GitHub Actions maybe through [`repository_dispatch`](https://stackoverflow.com/questions/68147899/whats-is-the-difference-between-repository-dispatch-and-workflow-dispatch-in-git)
 * [x] Tablet/Desktop Layout
-* [x] Add components and plumbing to create a blurDataHash 
+* [x] Add components and plumbing to create a blurDataHash
+* [ ] Unblock main thread on Canvas - move to Web Worker. [Maybe?](https://developer.chrome.com/blog/offscreen-canvas/)
+* [ ] Move Canvas behaviour logic in to a dedicated module
 
 
 #### NextJS
