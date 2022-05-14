@@ -67,6 +67,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
         img.current.decode().then(() => {
           setMakeCanvasActive(true);
           setLoadingStripe(false);
+          clearAndDraw();
         });
       }
     }

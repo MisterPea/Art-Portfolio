@@ -19,8 +19,6 @@ export async function getServerSideProps() {
     region: 'us-east-1'
   });
 
-  console.log(process.env.AWS_S3_ACCESS);
-
   const params = {
     Bucket: 'perryangelora.com',
     Key: 'cms/cms.json',
@@ -67,7 +65,6 @@ export default function Home({ thumbContents }) {
       if(query[queryKeys[0]] === 'AccessDenied' && status === 'authenticated') {
         resetPath();
       }
-     
     }
   }, [router.query, status]);
 
