@@ -71,8 +71,21 @@
           top: 0;
         }
       }
+      // .mag-label {
+      //   width: 100%;
+      //   margin: 0 auto;
+      //   background-color: aqua;
+      // }
     }
-    
+  }
+
+  .mag-label-wrap {
+    margin-top: 10px;
+    .mag-label {
+      display: block;
+      text-align: center;
+      @include bold-text;
+    }
   }
 
   #main-canvas {
@@ -91,13 +104,16 @@
   input[type=range] {
     border: none;
   }
+
+  
+
   .magnification-slider {
     // @media (hover: none) {
     //   display: none;
     // }
     
     width: 99%;
-    margin: 0 auto;
+    margin: 0 auto 20px;
   }
 
   input[type="range"] {

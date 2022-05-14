@@ -9,17 +9,17 @@ This repository consists of two parts:
 #### The website is available here: [https://perryangelora.com](https://perryangelora.com)
 
 Todo:
-#### CMS - NextJS SSR - Concived for desktop use only. 
+#### CMS - NextJS SSR - Conceived for desktop use only. 
 * [x] Find all relevant thumbnails per gallery. e.g. All/Polychrome/Monochrome
 * [x] Download current thumbnails
 * [x] Deleting thumbnails deletes image and updates JSON
-* [x] Allow remaking/editing of existing thumbnail and change/update text - x,y and zoom of thum preserved 
+* [x] Allow remaking/editing of existing thumbnail and change/update text - x,y and zoom of thumb preserved 
 * [x] Upload image/choose thumbnail/upload thumbnail
 * [x] Add info for image - [JSON stored on S3](https://dev.to/aws-builders/using-aws-s3-as-a-database-17l0)
 * [x] Drag reorder of thumbnails
 * [x] Add auth to prevent unauthorized edits
 * [x] Update database on reorder and before navigation away from site (if needed)
-* [ ] Will exist as a subdomain...updating site will trigger a rebuild via GitHub Actions maybe through [`repository_dispatch`](https://stackoverflow.com/questions/68147899/whats-is-the-difference-between-repository-dispatch-and-workflow-dispatch-in-git)
+* [ ] ~~ Will exist as a subdomain...updating site will trigger a rebuild via GitHub Actions maybe through [`repository_dispatch`](https://stackoverflow.com/questions/68147899/whats-is-the-difference-between-repository-dispatch-and-workflow-dispatch-in-git)
 * [x] Tablet/Desktop Layout
 * [x] Add components and plumbing to create a blurDataHash
 * [ ] Unblock main thread on Canvas - move to Web Worker. [Maybe?](https://developer.chrome.com/blog/offscreen-canvas/)

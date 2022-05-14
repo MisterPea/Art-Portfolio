@@ -1,5 +1,3 @@
-import Head from 'next/head';
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
@@ -10,12 +8,15 @@ import { S3, S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import ModalComponentWrapper from '../src/components/ModalComponentWrapper';
 import axios from 'axios';
 import Button from '../src/components/Button';
+import IncludeMobile from '../src/components/IncludeMobile';
 
 export async function getServerSideProps() {
   
   const S3 = new S3Client({
-    accessKeyId: process.env.AWS_S3_ACCESS,
-    secretAccessKey: process.env.AWS_S3_SECRET,
+    credentials:{
+      accessKeyId:process.env.AWS_S3_ACCESS,
+      secretAccessKey:process.env.AWS_S3_SECRET
+    },
     region: 'us-east-1'
   });
 
@@ -65,7 +66,6 @@ export default function Home({ thumbContents }) {
       if(query[queryKeys[0]] === 'AccessDenied' && status === 'authenticated') {
         resetPath();
       }
-     
     }
   }, [router.query, status]);
 
@@ -126,8 +126,13 @@ export default function Home({ thumbContents }) {
           <LoginError />
         </ModalComponentWrapper>}
       <Navbar />
-      <ThumbCreator thumbs={thumbContents} refresh={refreshData} toEdit={edit} resetEdit={resetEditEntry} />
-      <ThumbDisplay thumbs={thumbContents} makeEdit={editEntry} deleteEntry={deleteEntry} />
+      <div className='include-mobile'>
+        <IncludeMobile />
+      </div>
+      <div className='exclude-mobile'>
+        <ThumbCreator thumbs={thumbContents} refresh={refreshData} toEdit={edit} resetEdit={resetEditEntry} />
+        <ThumbDisplay thumbs={thumbContents} makeEdit={editEntry} deleteEntry={deleteEntry} />
+      </div>
       <footer>{`©${year} Perry Angelora`}</footer>
     </>
   );

@@ -75,6 +75,7 @@ button {
   align-items: center;
   margin-top: -10px;
   justify-content: center;
+  overflow-x: hidden;
 }
 
 .inner-image-wrap {
@@ -132,6 +133,7 @@ button {
   position: fixed;
   height: 100%;
   width: 100%;
+  overflow-x: hidden;
 
   top: 0;
   backdrop-filter: blur(2px);
