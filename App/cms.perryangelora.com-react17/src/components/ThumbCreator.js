@@ -516,6 +516,7 @@ export default function ThumbCreator({ thumbs, refresh, toEdit, resetEdit }) {
           <TextInput action={handleInputText} value={text.title} label="Title:" placeholder="Enter Title" />
           <TextInput action={handleInputText} value={text.medAndSize} label="Medium/Size:" placeholder="Enter Medium and Size" />
           <SingleOptionInput action={handleInputText} value={text.gallery} label="Gallery:" placeholder="Enter Gallery Title" />
+          <div className='mag-label-wrap'><label className="mag-label" htmlFor='range'>Scale Image</label></div>
           <input
             className="magnification-slider"
             onChange={(e) => handleMag(e)}

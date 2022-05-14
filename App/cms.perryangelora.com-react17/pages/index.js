@@ -8,6 +8,7 @@ import { S3, S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import ModalComponentWrapper from '../src/components/ModalComponentWrapper';
 import axios from 'axios';
 import Button from '../src/components/Button';
+import IncludeMobile from '../src/components/IncludeMobile';
 
 export async function getServerSideProps() {
   
@@ -125,8 +126,13 @@ export default function Home({ thumbContents }) {
           <LoginError />
         </ModalComponentWrapper>}
       <Navbar />
-      <ThumbCreator thumbs={thumbContents} refresh={refreshData} toEdit={edit} resetEdit={resetEditEntry} />
-      <ThumbDisplay thumbs={thumbContents} makeEdit={editEntry} deleteEntry={deleteEntry} />
+      <div className='include-mobile'>
+        <IncludeMobile />
+      </div>
+      <div className='exclude-mobile'>
+        <ThumbCreator thumbs={thumbContents} refresh={refreshData} toEdit={edit} resetEdit={resetEditEntry} />
+        <ThumbDisplay thumbs={thumbContents} makeEdit={editEntry} deleteEntry={deleteEntry} />
+      </div>
       <footer>{`©${year} Perry Angelora`}</footer>
     </>
   );

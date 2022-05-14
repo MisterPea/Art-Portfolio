@@ -43,6 +43,37 @@ html {
   font-size: 16px;
 }
 
+@media (hover:hover) {
+  .include-mobile {
+    display: none;
+  }
+}
+
+@media (hover: none) {
+  .include-mobile {
+    height: 100vh;
+    .please-dont-think-less-of-me {
+      height: 100%;
+      top: 30%;
+      position: fixed;
+      margin: 0 15%;
+      text-align: center;
+      h2 {
+        font-size: 2rem;
+        @include bold-text;
+      }
+      p {
+        @include regular-text;
+        font-size: 1.35rem;
+      }
+    }
+  }
+
+  .exclude-mobile {
+    display: none;
+  }
+}
+
 footer {
   text-align: center;
   @include regular-text;
