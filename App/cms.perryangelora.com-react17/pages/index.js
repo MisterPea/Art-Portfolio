@@ -1,5 +1,3 @@
-import Head from 'next/head';
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
@@ -14,10 +12,14 @@ import Button from '../src/components/Button';
 export async function getServerSideProps() {
   
   const S3 = new S3Client({
-    accessKeyId: process.env.AWS_S3_ACCESS,
-    secretAccessKey: process.env.AWS_S3_SECRET,
+    credentials:{
+      accessKeyId:process.env.AWS_S3_ACCESS,
+      secretAccessKey:process.env.AWS_S3_SECRET
+    },
     region: 'us-east-1'
   });
+
+  console.log(process.env.AWS_S3_ACCESS);
 
   const params = {
     Bucket: 'perryangelora.com',
