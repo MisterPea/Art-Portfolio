@@ -34,7 +34,7 @@ export default function About() {
       <div className='bio'>
         <h2>About</h2>
         <p>Born on Long Island, New York, Perry earned his BFA from the University of Central Florida and his MFA from the Pratt Institute, Brooklyn.
-    He has exhibited his work both nationally and internationally and has taught at Montclair State University, Hunter College, and Edinburgh College of Art Summer School. In 2015 he was a recipient of the <i>New York Foundation for the Arts Fellowship in Printmaking/Drawing/Book Arts</i> and was a finalist for the <i>2017 Alexander Rutsch Award and Solo Exhibition for Painting.</i>
+        He has exhibited his work both nationally and internationally and has taught at Montclair State University, Hunter College, and Edinburgh College of Art Summer School. He has been a recipient of the <i>New York Foundation for the Arts Fellowship in Printmaking/Drawing/Book Arts</i> and was a finalist for the <i>Alexander Rutsch Award and Solo Exhibition for Painting.</i>
         <br /><br />Perry lives and works in Brooklyn, New York.</p>
         <div className='social'>
           <ul>   <li className='instagram-icon' onClick={() => buttonClick('https://www.instagram.com/perry_angelora/')}>

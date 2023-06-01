@@ -23,7 +23,7 @@ const variants = {
       zIndex: 0,
       x: direction < 0 ? '100%' : '-100%',
       opacity: 0,
-      transition:{
+      transition: {
         x: { type: 'spring', stiffness: 600, damping: 30 },
         opacity: { duration: 0.4 },
         duration: 1,
@@ -33,7 +33,7 @@ const variants = {
 };
 
 export default function ImageDisplay({ images, closeModal }) {
- 
+
   const controls = useAnimation();
   const router = useRouter();
   const initialPage = images.findIndex((e) => e.id === router.query.image);
@@ -56,43 +56,43 @@ export default function ImageDisplay({ images, closeModal }) {
 
   const imageDimensions = setImageSize(images[imageIndex].ratio.h, images[imageIndex].ratio.w);
   const blurDataURL = blurDataToBase64(images[imageIndex].blurHash, images[imageIndex].ratio.w, images[imageIndex].ratio.h);
-
+  console.log('blur-->:', blurDataURL);
   // An instance of it just works - not exactly sure why, ¯\_(ツ)_/¯
   // but this needs to be revisited.
   async function handleDragEnd(_, info) {
     const offset = info.offset.x;
     const velocity = info.velocity.x;
-   
-    if(offset < -150 || velocity < -500) {
+
+    if (offset < -150 || velocity < -500) {
       await controls.start({
         x: '-100%',
         opacity: 1,
         transition: {
-          duration:0.2, ease:[.25, .01, .53, 1] 
-        } 
+          duration: 0.2, ease: [.25, .01, .53, 1]
+        }
       });
       paginate(1);
-   
-    } else if(offset > 150 || velocity > 500 ){
+
+    } else if (offset > 150 || velocity > 500) {
       await controls.start({
         x: '100%',
         opacity: 1,
         transition: {
-          duration:0.2, ease:[.25, .01, .53, 1] 
-        } 
+          duration: 0.2, ease: [.25, .01, .53, 1]
+        }
       });
       paginate(-1);
-    }   
+    }
   }
 
-  function handleKeyDown(e){
+  function handleKeyDown(e) {
     const nextBtn = document.querySelector('.next');
     const prevBtn = document.querySelector('.prev');
     e.stopPropagation();
-    switch(e.keyCode){
+    switch (e.keyCode) {
       case 39:
         return nextBtn.click();
-      case 37: 
+      case 37:
         return prevBtn.click();
       case 27:
         return closeModal();
@@ -102,7 +102,7 @@ export default function ImageDisplay({ images, closeModal }) {
   };
 
   // Update query string on advance. 
-  if(Object.keys(router.query).length !== 0 && router.query.image !== images[imageIndex].id) {
+  if (Object.keys(router.query).length !== 0 && router.query.image !== images[imageIndex].id) {
     router.push(`${router.pathname}?image=${images[imageIndex].id}`, undefined, { shallow: true });
   }
 
@@ -123,16 +123,17 @@ export default function ImageDisplay({ images, closeModal }) {
             dragElastic={1}
             animate={controls}
             onDragEnd={handleDragEnd}
-            transition={{ x: {
-              type: 'tween',
-              duration: 0.1,
-              // ease: 'easeInOut'
-            },
+            transition={{
+              x: {
+                type: 'tween',
+                duration: 0.1,
+                // ease: 'easeInOut'
+              },
 
-            
+
             }}
           >
-            <div className='inner-image-wrap' style={{ width:imageDimensions.w,  height:imageDimensions.h }}>
+            <div className='inner-image-wrap' style={{ width: imageDimensions.w, height: imageDimensions.h }}>
               <Image
                 src={`/cms/images/${images[imageIndex].mainFileName}`}
                 alt="none"
